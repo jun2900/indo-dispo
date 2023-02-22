@@ -1,0 +1,482 @@
+definitions:
+  entity.AddBillReq:
+    properties:
+      bill_attachments:
+        items:
+          $ref: '#/definitions/entity.Attachment'
+        type: array
+      bill_discount:
+        type: integer
+      bill_due_date:
+        type: string
+      bill_items:
+        items:
+          $ref: '#/definitions/entity.ItemPurchase'
+        type: array
+      bill_number:
+        type: string
+      bill_order_number:
+        type: string
+      bill_start_date:
+        type: string
+      bill_type:
+        type: string
+      supplier_id:
+        type: integer
+    type: object
+  entity.AddItemReq:
+    properties:
+      item_description:
+        type: string
+      item_name:
+        type: string
+      item_purchase_price:
+        type: integer
+      item_sell_price:
+        type: integer
+    type: object
+  entity.Attachment:
+    properties:
+      attachment_file:
+        items:
+          type: integer
+        type: array
+      attachment_name:
+        type: string
+    type: object
+  entity.BillDetailsResp:
+    properties:
+      bill_attachments:
+        items:
+          $ref: '#/definitions/entity.Attachment'
+        type: array
+      bill_discount:
+        type: integer
+      bill_due_date:
+        type: string
+      bill_items:
+        items:
+          $ref: '#/definitions/entity.ItemBill'
+        type: array
+      bill_number:
+        type: string
+      bill_order_number:
+        type: string
+      bill_start_date:
+        type: string
+      bill_status:
+        type: string
+      bill_subtotal:
+        type: integer
+      bill_total:
+        type: integer
+      bill_type:
+        type: string
+    type: object
+  entity.BillHeaderResp:
+    properties:
+      bill_draft:
+        type: integer
+      bill_open:
+        type: integer
+      bill_overdue:
+        type: integer
+    type: object
+  entity.ErrRespController:
+    properties:
+      err_message:
+        type: string
+      source_function:
+        type: string
+    type: object
+  entity.ItemBill:
+    properties:
+      item_amount:
+        type: integer
+      item_description:
+        type: string
+      item_name:
+        type: string
+      item_price:
+        type: integer
+      item_qty:
+        type: integer
+    type: object
+  entity.ItemPurchase:
+    properties:
+      item_id:
+        type: integer
+      item_qty:
+        type: integer
+    type: object
+  entity.LoginReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  entity.LoginResp:
+    properties:
+      access_token:
+        type: string
+    type: object
+  entity.PagedResults:
+    properties:
+      data: {}
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_records:
+        type: integer
+    type: object
+  entity.StatusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  entity.SupplierAddReq:
+    properties:
+      supplier_address:
+        type: string
+      supplier_email:
+        type: string
+      supplier_name:
+        type: string
+      supplier_npwp:
+        type: string
+      supplier_telephone:
+        type: string
+      supplier_type:
+        type: string
+      supplier_web:
+        type: string
+    type: object
+  model.VSupplierBill:
+    properties:
+      bill_discount:
+        type: integer
+      bill_due_date:
+        type: string
+      bill_id:
+        type: integer
+      bill_number:
+        type: string
+      bill_order_number:
+        type: string
+      bill_start_date:
+        type: string
+      bill_status:
+        type: string
+      bill_type:
+        type: string
+      supplier_id:
+        type: integer
+      supplier_name:
+        type: string
+      supplier_type:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Test Accounting App
+  version: "1.0"
+paths:
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with email and password
+      parameters:
+      - description: login user input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.LoginResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Login
+      tags:
+      - Admin Auth
+  /bill:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: add bill request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.AddBillReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Register Bill
+      tags:
+      - Bill
+  /bill/{billId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: bill id
+        in: path
+        name: billId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.BillDetailsResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Get Bill Details
+      tags:
+      - Bill
+  /bill/header:
+    get:
+      consumes:
+      - application/json
+      description: get bill overdue open and draft stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.BillHeaderResp'
+      summary: Get Bill Header
+      tags:
+      - Bill
+  /bills:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: page requested (defaults to 0)
+        in: query
+        name: page
+        type: integer
+      - description: number of records in a page  (defaults to 20)
+        in: query
+        name: pagesize
+        type: integer
+      - description: asc / desc
+        in: query
+        name: order
+        type: string
+      - description: filter by bill status
+        in: query
+        name: status
+        type: string
+      - description: filter by bill vendor
+        in: query
+        name: vendor
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/entity.PagedResults'
+            - properties:
+                Data:
+                  items:
+                    $ref: '#/definitions/model.VSupplierBill'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: List All Bill
+      tags:
+      - Bill
+  /item:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: add item request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.AddItemReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Register Item
+      tags:
+      - Item
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      parameters:
+      - description: token from login user (use Bearer in front of the jwt)
+        in: header
+        name: x-access-token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: pong
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: ping example
+      tags:
+      - Ping
+  /supplier:
+    post:
+      consumes:
+      - application/json
+      description: register supplier (vendor or customer)
+      parameters:
+      - description: supplier request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SupplierAddReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Register Supplier
+      tags:
+      - Supplier
+  /suppliers:
+    get:
+      consumes:
+      - application/json
+      description: get suppliers by their type
+      parameters:
+      - description: page requested (defaults to 0)
+        in: query
+        name: page
+        type: integer
+      - description: number of records in a page  (defaults to 20)
+        in: query
+        name: pagesize
+        type: integer
+      - description: asc / desc
+        in: query
+        name: order
+        type: string
+      - description: supplier name
+        in: query
+        name: name
+        type: string
+      - description: supplier email
+        in: query
+        name: email
+        type: string
+      - description: supplier address
+        in: query
+        name: address
+        type: string
+      - description: supplier type (vendor or customer)
+        in: query
+        name: supplierType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Get All Suplier
+      tags:
+      - Supplier
+swagger: "2.0"
