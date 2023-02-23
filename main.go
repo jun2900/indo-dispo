@@ -53,11 +53,12 @@ func main() {
 	itemPurchaseService := services.NewItemPurchaseService(DB)
 	attachmentService := services.NewAttachmentService(DB)
 	adminService := services.NewAdminService(DB)
+	itemSupplierService := services.NewItemSupplierService(DB)
 
 	//controllers
 	supplierController := controller.NewSupplierController(supplierService)
-	itemController := controller.NewItemController(itemService)
-	billController := controller.NewBillController(supplierService, billService, itemPurchaseService, itemService, attachmentService)
+	itemController := controller.NewItemController(itemService, itemSupplierService)
+	billController := controller.NewBillController(supplierService, billService, itemPurchaseService, itemService, attachmentService, itemSupplierService)
 	adminController := controller.NewAuthController(adminService)
 
 	app := fiber.New()

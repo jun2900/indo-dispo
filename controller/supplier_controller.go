@@ -46,7 +46,7 @@ func (s *SupplierController) GetAllSupplierByType(c *fiber.Ctx) error {
 	email := c.Query("email", "")
 	address := c.Query("address", "")
 
-	suppliers, totalRows, err := s.supplierService.GetAllSupplierByType(c.Query("supplierType", ""), page, pagesize, order, name, email, address)
+	suppliers, totalRows, err := s.supplierService.GetAllSupplierByType(strings.ToLower(c.Query("supplierType", "")), page, pagesize, order, name, email, address)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
@@ -105,7 +105,7 @@ func (s *SupplierController) RegisterSupplier(c *fiber.Ctx) error {
 		SupplierWeb:       input.Web,
 		SupplierNpwp:      input.Npwp,
 		SupplierAddress:   input.Address,
-		SupplierType:      input.Type,
+		SupplierType:      strings.ToUpper(input.Type),
 	})
 
 	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{

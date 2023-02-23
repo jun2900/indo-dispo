@@ -10,12 +10,14 @@ import (
 )
 
 type ItemController struct {
-	itemService services.ItemService
+	itemService         services.ItemService
+	itemSupplierService services.ItemSupplierService
 }
 
-func NewItemController(itemService services.ItemService) *ItemController {
+func NewItemController(itemService services.ItemService, itemSupplierService services.ItemSupplierService) *ItemController {
 	return &ItemController{
-		itemService: itemService,
+		itemService:         itemService,
+		itemSupplierService: itemSupplierService,
 	}
 }
 
@@ -47,15 +49,38 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 		})
 	}
 
-	if _, _, err := i.itemService.CreateItem(&model.Item{
-		ItemName:          input.Name,
-		ItemDescription:   input.Description,
-		ItemPurchasePrice: input.PurchasePrice,
-		ItemSellPrice:     input.SellPrice,
-	}); err != nil {
+	item, err := i.itemService.GetItemByItemName(input.Name)
+	if item != nil {
+		_, _, err := i.itemSupplierService.GetItemSupplierByItemIdAndSupplierId(item.ItemID, input.SupplierId)
+		if err == nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     "a supplier cannot have the same item",
+			})
+		}
+	} else if err != nil {
+		item, _, err = i.itemService.CreateItem(&model.Item{
+			ItemName:        input.Name,
+			ItemDescription: input.Description,
+		})
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on registering item, details = %v", err),
+			})
+		}
+	}
+
+	_, _, err = i.itemSupplierService.CreateItemSupplier(&model.ItemSupplier{
+		ItemID:                    item.ItemID,
+		SupplierID:                input.SupplierId,
+		ItemSupplierPurchasePrice: input.PurchasePrice,
+		ItemSupplierSellPrice:     input.SellPrice,
+	})
+	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on registering item, details = %v", err),
+			ErrMessage:     fmt.Sprintf("error on registering item supplier, details = %v", err),
 		})
 	}
 

@@ -9,6 +9,7 @@ import (
 type ItemService interface {
 	CreateItem(record *model.Item) (results *model.Item, RowsAffected int64, err error)
 	GetItem(itemId int32) (result *model.Item, err error)
+	GetItemByItemName(itemName string) (result *model.Item, err error)
 }
 
 func NewItemService(mysqlConnection *gorm.DB) ItemService {
@@ -28,6 +29,13 @@ func (r *mysqlDBRepository) CreateItem(record *model.Item) (results *model.Item,
 
 func (r *mysqlDBRepository) GetItem(itemId int32) (result *model.Item, err error) {
 	if err = r.mysql.First(&result, itemId).Error; err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (r *mysqlDBRepository) GetItemByItemName(itemName string) (result *model.Item, err error) {
+	if err = r.mysql.Where("item_name = ?", itemName).First(&result).Error; err != nil {
 		return nil, err
 	}
 	return result, nil

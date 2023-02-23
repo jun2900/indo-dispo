@@ -18,15 +18,17 @@ type BillController struct {
 	itemPurchaseService services.ItemPurchaseService
 	itemService         services.ItemService
 	attachmentService   services.AttachmentService
+	itemSupplierService services.ItemSupplierService
 }
 
-func NewBillController(supplierService services.SupplierService, billService services.BillService, itemPurchaseService services.ItemPurchaseService, itemService services.ItemService, attachmentService services.AttachmentService) *BillController {
+func NewBillController(supplierService services.SupplierService, billService services.BillService, itemPurchaseService services.ItemPurchaseService, itemService services.ItemService, attachmentService services.AttachmentService, itemSupplierService services.ItemSupplierService) *BillController {
 	return &BillController{
 		supplierService:     supplierService,
 		billService:         billService,
 		itemPurchaseService: itemPurchaseService,
 		itemService:         itemService,
 		attachmentService:   attachmentService,
+		itemSupplierService: itemSupplierService,
 	}
 }
 
@@ -146,14 +148,14 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 
 	total := 0
 	for _, item := range input.Items {
-		it, err := b.itemService.GetItem(item.ItemId)
+		it, _, err := b.itemSupplierService.GetItemSupplierByItemIdAndSupplierId(item.ItemId, input.SupplierId)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 				SourceFunction: functionName,
-				ErrMessage:     fmt.Sprintf("error on getting item with id %d details = %v", item.ItemId, err),
+				ErrMessage:     fmt.Sprintf("error on getting item with item id '%d' and supplier id  '%d' details = %v", item.ItemId, input.SupplierId, err),
 			})
 		}
-		total += int(*it.ItemPurchasePrice) * int(item.ItemQty)
+		total += int(it.ItemSupplierPurchasePrice) * int(item.ItemQty)
 	}
 
 	bill, _, err := b.billService.CreateBill(&model.Bill{
@@ -281,12 +283,21 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 				ErrMessage:     fmt.Sprintf("error on getting item purchases with bill id %d details = %v", bill.BillID, err),
 			})
 		}
+
+		is, _, err := b.itemSupplierService.GetItemSupplierByItemIdAndSupplierId(item.ItemID, bill.SupplierID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on getting item supplier with supplier id '%d' and item id '%d' details = %v", bill.SupplierID, item.ItemID, err),
+			})
+		}
+
 		itemBills = append(itemBills, entity.ItemBill{
 			Name:        item.ItemName,
 			Description: item.ItemDescription,
 			Qty:         ip.ItemPurchaseQty,
-			Price:       *item.ItemPurchasePrice,
-			Amount:      *item.ItemPurchasePrice*ip.ItemPurchaseQty - *item.ItemPurchasePrice*ip.ItemPurchaseQty**bill.BillDiscount/100,
+			Price:       is.ItemSupplierPurchasePrice,
+			Amount:      is.ItemSupplierPurchasePrice*ip.ItemPurchaseQty - is.ItemSupplierPurchasePrice*ip.ItemPurchaseQty**bill.BillDiscount/100,
 		})
 	}
 

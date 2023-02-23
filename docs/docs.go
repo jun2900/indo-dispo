@@ -523,6 +523,9 @@ const docTemplate_swagger = `{
                 },
                 "item_sell_price": {
                     "type": "integer"
+                },
+                "supplier_id": {
+                    "type": "integer"
                 }
             }
         },
