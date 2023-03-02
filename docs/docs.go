@@ -524,6 +524,15 @@ const docTemplate_swagger = `{
                 "item_sell_price": {
                     "type": "integer"
                 },
+                "item_unit": {
+                    "type": "string"
+                },
+                "item_wholesalers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.WholeSaler"
+                    }
+                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -712,6 +721,17 @@ const docTemplate_swagger = `{
                 },
                 "supplier_web": {
                     "type": "string"
+                }
+            }
+        },
+        "entity.WholeSaler": {
+            "type": "object",
+            "properties": {
+                "wholesaler_price": {
+                    "type": "integer"
+                },
+                "wholesaler_qty": {
+                    "type": "integer"
                 }
             }
         },

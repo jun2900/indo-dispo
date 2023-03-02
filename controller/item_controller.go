@@ -12,12 +12,14 @@ import (
 type ItemController struct {
 	itemService         services.ItemService
 	itemSupplierService services.ItemSupplierService
+	wholesalerService   services.WholesalerService
 }
 
-func NewItemController(itemService services.ItemService, itemSupplierService services.ItemSupplierService) *ItemController {
+func NewItemController(itemService services.ItemService, itemSupplierService services.ItemSupplierService, wholesalerService services.WholesalerService) *ItemController {
 	return &ItemController{
 		itemService:         itemService,
 		itemSupplierService: itemSupplierService,
+		wholesalerService:   wholesalerService,
 	}
 }
 
@@ -49,6 +51,13 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 		})
 	}
 
+	if len(input.Unit) < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "item unit cannot be empty",
+		})
+	}
+
 	item, err := i.itemService.GetItemByItemName(input.Name)
 	if item != nil {
 		_, _, err := i.itemSupplierService.GetItemSupplierByItemIdAndSupplierId(item.ItemID, input.SupplierId)
@@ -71,11 +80,30 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 		}
 	}
 
+	if len(input.WholeSalers) > 0 {
+		var wholeSalers []model.Wholesaler
+		for _, ws := range input.WholeSalers {
+			wholeSalers = append(wholeSalers, model.Wholesaler{
+				ItemID:          item.ItemID,
+				WholesalerQty:   ws.Qty,
+				WholesalerPrice: ws.Price,
+			})
+		}
+		_, _, err := i.wholesalerService.CreateWholesaler(wholeSalers)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on creating wholesaler, details = %v", err),
+			})
+		}
+	}
+
 	_, _, err = i.itemSupplierService.CreateItemSupplier(&model.ItemSupplier{
 		ItemID:                    item.ItemID,
 		SupplierID:                input.SupplierId,
 		ItemSupplierPurchasePrice: input.PurchasePrice,
 		ItemSupplierSellPrice:     input.SellPrice,
+		ItemSupplierUnit:          input.Unit,
 	})
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{

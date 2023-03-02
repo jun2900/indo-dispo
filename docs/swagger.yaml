@@ -34,6 +34,12 @@ definitions:
         type: integer
       item_sell_price:
         type: integer
+      item_unit:
+        type: string
+      item_wholesalers:
+        items:
+          $ref: '#/definitions/entity.WholeSaler'
+        type: array
       supplier_id:
         type: integer
     type: object
@@ -157,6 +163,13 @@ definitions:
         type: string
       supplier_web:
         type: string
+    type: object
+  entity.WholeSaler:
+    properties:
+      wholesaler_price:
+        type: integer
+      wholesaler_qty:
+        type: integer
     type: object
   model.VSupplierBill:
     properties:
