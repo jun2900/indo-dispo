@@ -9,6 +9,7 @@ import (
 type ItemSupplierService interface {
 	CreateItemSupplier(record *model.ItemSupplier) (results *model.ItemSupplier, RowsAffected int64, err error)
 	GetItemSupplierByItemIdAndSupplierId(itemId, supplierId int32) (result *model.ItemSupplier, RowsAffected int64, err error)
+	GetItemSupplierBySupplierId(supplierId int32) (result []model.ItemSupplier, RowsAffected int64, err error)
 }
 
 func NewItemSupplierService(mysqlConnection *gorm.DB) ItemSupplierService {
@@ -28,6 +29,13 @@ func (r *mysqlDBRepository) CreateItemSupplier(record *model.ItemSupplier) (resu
 
 func (r *mysqlDBRepository) GetItemSupplierByItemIdAndSupplierId(itemId, supplierId int32) (result *model.ItemSupplier, RowsAffected int64, err error) {
 	if err = r.mysql.Where("item_id = ? AND supplier_id = ?", itemId, supplierId).First(&result).Error; err != nil {
+		return nil, -1, err
+	}
+	return result, RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) GetItemSupplierBySupplierId(supplierId int32) (result []model.ItemSupplier, RowsAffected int64, err error) {
+	if err = r.mysql.Where("supplier_id = ?", supplierId).Find(&result).Error; err != nil {
 		return nil, -1, err
 	}
 	return result, RowsAffected, nil

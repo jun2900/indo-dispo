@@ -11,12 +11,18 @@ import (
 )
 
 type SupplierController struct {
-	supplierService services.SupplierService
+	supplierService     services.SupplierService
+	itemSupplierService services.ItemSupplierService
+	wholesalerService   services.WholesalerService
+	itemService         services.ItemService
 }
 
-func NewSupplierController(supplierService services.SupplierService) *SupplierController {
+func NewSupplierController(supplierService services.SupplierService, itemSupplierService services.ItemSupplierService, wholesalerService services.WholesalerService, itemService services.ItemService) *SupplierController {
 	return &SupplierController{
-		supplierService: supplierService,
+		supplierService:     supplierService,
+		itemSupplierService: itemSupplierService,
+		wholesalerService:   wholesalerService,
+		itemService:         itemService,
 	}
 }
 
@@ -111,4 +117,54 @@ func (s *SupplierController) RegisterSupplier(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{
 		Status: "supplier registered",
 	})
+}
+
+// @Summary Get All Items By Supplier Id
+// @Tags Supplier
+// @Accept  json
+// @Produce  json
+// @Param  supplierId path int true "supplier id"
+// @Success 200 {object} []entity.ListItemBySupplierResp
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /supplier/{supplierId}/items [get]
+func (s *SupplierController) GetItemsBySupplierId(c *fiber.Ctx) error {
+	functionName := "GetItemsBySupplierId"
+
+	supplierId, err := c.ParamsInt("supplierId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing supplier id, details = %v", err),
+		})
+	}
+
+	itemSuppliers, _, err := s.itemSupplierService.GetItemSupplierBySupplierId(int32(supplierId))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting item supplier by supplier id, details = %v", err),
+		})
+	}
+
+	var resp []entity.ListItemBySupplierResp
+	for _, is := range itemSuppliers {
+		item, err := s.itemService.GetItem(is.ItemID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on getting item, details = %v", err),
+			})
+		}
+
+		resp = append(resp, entity.ListItemBySupplierResp{
+			PurchasePrice: is.ItemSupplierPurchasePrice,
+			SellPrice:     is.ItemSupplierSellPrice,
+			Unit:          is.ItemSupplierUnit,
+			Name:          item.ItemName,
+			Description:   item.ItemDescription,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(resp)
 }

@@ -54,10 +54,11 @@ func main() {
 	attachmentService := services.NewAttachmentService(DB)
 	adminService := services.NewAdminService(DB)
 	itemSupplierService := services.NewItemSupplierService(DB)
+	wholesalerService := services.NewWholesalerService(DB)
 
 	//controllers
-	supplierController := controller.NewSupplierController(supplierService)
-	itemController := controller.NewItemController(itemService, itemSupplierService)
+	supplierController := controller.NewSupplierController(supplierService, itemSupplierService, wholesalerService, itemService)
+	itemController := controller.NewItemController(itemService, itemSupplierService, wholesalerService)
 	billController := controller.NewBillController(supplierService, billService, itemPurchaseService, itemService, attachmentService, itemSupplierService)
 	adminController := controller.NewAuthController(adminService)
 
@@ -75,6 +76,7 @@ func main() {
 	app.Get("/suppliers", supplierController.GetAllSupplierByType)
 
 	app.Post("/supplier", supplierController.RegisterSupplier)
+	app.Get("/supplier/:supplierId/items", supplierController.GetItemsBySupplierId)
 	app.Post("/item", itemController.RegisterItem)
 	app.Post("/bill", billController.CreateBill)
 

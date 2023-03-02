@@ -379,6 +379,52 @@
                 }
             }
         },
+        "/supplier/{supplierId}/items": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Supplier"
+                ],
+                "summary": "Get All Items By Supplier Id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "supplier id",
+                        "name": "supplierId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.ListItemBySupplierResp"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/suppliers": {
             "get": {
                 "description": "get suppliers by their type",
@@ -639,6 +685,26 @@
                 },
                 "item_qty": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.ListItemBySupplierResp": {
+            "type": "object",
+            "properties": {
+                "item_description": {
+                    "type": "string"
+                },
+                "item_name": {
+                    "type": "string"
+                },
+                "item_purchase_price": {
+                    "type": "integer"
+                },
+                "item_sell_price": {
+                    "type": "integer"
+                },
+                "item_unit": {
+                    "type": "string"
                 }
             }
         },
