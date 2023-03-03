@@ -8,9 +8,13 @@ const TableNameItem = "items"
 
 // Item mapped from table <items>
 type Item struct {
-	ItemID          int32   `gorm:"column:item_id;primaryKey;autoIncrement:true" json:"item_id"`
-	ItemName        string  `gorm:"column:item_name;not null" json:"item_name"`
-	ItemDescription *string `gorm:"column:item_description" json:"item_description"`
+	ItemID            int32   `gorm:"column:item_id;primaryKey;autoIncrement:true" json:"item_id"`
+	SupplierID        int32   `gorm:"column:supplier_id;not null" json:"supplier_id"`
+	ItemName          string  `gorm:"column:item_name;not null" json:"item_name"`
+	ItemDescription   *string `gorm:"column:item_description" json:"item_description"`
+	ItemPurchasePrice int32   `gorm:"column:item_purchase_price;not null" json:"item_purchase_price"`
+	ItemSellPrice     int32   `gorm:"column:item_sell_price;not null" json:"item_sell_price"`
+	ItemUnit          string  `gorm:"column:item_unit;not null" json:"item_unit"`
 }
 
 // TableName Item's table name

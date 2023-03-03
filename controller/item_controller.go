@@ -10,16 +10,14 @@ import (
 )
 
 type ItemController struct {
-	itemService         services.ItemService
-	itemSupplierService services.ItemSupplierService
-	wholesalerService   services.WholesalerService
+	itemService       services.ItemService
+	wholesalerService services.WholesalerService
 }
 
-func NewItemController(itemService services.ItemService, itemSupplierService services.ItemSupplierService, wholesalerService services.WholesalerService) *ItemController {
+func NewItemController(itemService services.ItemService, wholesalerService services.WholesalerService) *ItemController {
 	return &ItemController{
-		itemService:         itemService,
-		itemSupplierService: itemSupplierService,
-		wholesalerService:   wholesalerService,
+		itemService:       itemService,
+		wholesalerService: wholesalerService,
 	}
 }
 
@@ -60,7 +58,7 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 
 	item, err := i.itemService.GetItemByItemName(input.Name)
 	if item != nil {
-		_, _, err := i.itemSupplierService.GetItemSupplierByItemIdAndSupplierId(item.ItemID, input.SupplierId)
+		_, err := i.itemService.GetItemWithItemIdAndSupplierId(item.ItemID, input.SupplierId)
 		if err == nil {
 			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 				SourceFunction: functionName,
@@ -69,8 +67,12 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 		}
 	} else if err != nil {
 		item, _, err = i.itemService.CreateItem(&model.Item{
-			ItemName:        input.Name,
-			ItemDescription: input.Description,
+			SupplierID:        input.SupplierId,
+			ItemName:          input.Name,
+			ItemDescription:   input.Description,
+			ItemPurchasePrice: input.PurchasePrice,
+			ItemSellPrice:     input.SellPrice,
+			ItemUnit:          input.Unit,
 		})
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
@@ -96,20 +98,6 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 				ErrMessage:     fmt.Sprintf("error on creating wholesaler, details = %v", err),
 			})
 		}
-	}
-
-	_, _, err = i.itemSupplierService.CreateItemSupplier(&model.ItemSupplier{
-		ItemID:                    item.ItemID,
-		SupplierID:                input.SupplierId,
-		ItemSupplierPurchasePrice: input.PurchasePrice,
-		ItemSupplierSellPrice:     input.SellPrice,
-		ItemSupplierUnit:          input.Unit,
-	})
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on registering item supplier, details = %v", err),
-		})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{

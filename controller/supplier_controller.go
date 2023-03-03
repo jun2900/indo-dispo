@@ -11,18 +11,16 @@ import (
 )
 
 type SupplierController struct {
-	supplierService     services.SupplierService
-	itemSupplierService services.ItemSupplierService
-	wholesalerService   services.WholesalerService
-	itemService         services.ItemService
+	supplierService   services.SupplierService
+	wholesalerService services.WholesalerService
+	itemService       services.ItemService
 }
 
-func NewSupplierController(supplierService services.SupplierService, itemSupplierService services.ItemSupplierService, wholesalerService services.WholesalerService, itemService services.ItemService) *SupplierController {
+func NewSupplierController(supplierService services.SupplierService, wholesalerService services.WholesalerService, itemService services.ItemService) *SupplierController {
 	return &SupplierController{
-		supplierService:     supplierService,
-		itemSupplierService: itemSupplierService,
-		wholesalerService:   wholesalerService,
-		itemService:         itemService,
+		supplierService:   supplierService,
+		wholesalerService: wholesalerService,
+		itemService:       itemService,
 	}
 }
 
@@ -139,7 +137,7 @@ func (s *SupplierController) GetItemsBySupplierId(c *fiber.Ctx) error {
 		})
 	}
 
-	itemSuppliers, _, err := s.itemSupplierService.GetItemSupplierBySupplierId(int32(supplierId))
+	itemSuppliers, _, err := s.itemService.GetItemBySupplierId(int32(supplierId))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
@@ -158,9 +156,9 @@ func (s *SupplierController) GetItemsBySupplierId(c *fiber.Ctx) error {
 		}
 
 		resp = append(resp, entity.ListItemBySupplierResp{
-			PurchasePrice: is.ItemSupplierPurchasePrice,
-			SellPrice:     is.ItemSupplierSellPrice,
-			Unit:          is.ItemSupplierUnit,
+			PurchasePrice: is.ItemPurchasePrice,
+			SellPrice:     is.ItemSellPrice,
+			Unit:          is.ItemUnit,
 			Name:          item.ItemName,
 			Description:   item.ItemDescription,
 		})
