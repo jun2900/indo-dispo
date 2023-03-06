@@ -121,6 +121,8 @@ definitions:
     properties:
       item_description:
         type: string
+      item_id:
+        type: integer
       item_name:
         type: string
       item_purchase_price:
@@ -176,6 +178,23 @@ definitions:
         type: string
       supplier_web:
         type: string
+    type: object
+  entity.UpdateItemReq:
+    properties:
+      item_description:
+        type: string
+      item_name:
+        type: string
+      item_purchase_price:
+        type: integer
+      item_sell_price:
+        type: integer
+      item_unit:
+        type: string
+      item_wholesalers:
+        items:
+          $ref: '#/definitions/entity.WholeSaler'
+        type: array
     type: object
   entity.WholeSaler:
     properties:
@@ -393,6 +412,40 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Register Item
+      tags:
+      - Item
+  /item/{itemId}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: item id
+        in: path
+        name: itemId
+        required: true
+        type: integer
+      - description: update item request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateItemReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Update Item
       tags:
       - Item
   /ping:

@@ -8,6 +8,7 @@ import (
 
 type WholesalerService interface {
 	CreateWholesaler(record []model.Wholesaler) (result []model.Wholesaler, RowsAffected int64, err error)
+	DeleteWholesalerByItemId(itemId int32) (result []model.Wholesaler, RowsAffected int64, err error)
 }
 
 func NewWholesalerService(mysqlConnection *gorm.DB) WholesalerService {
@@ -23,4 +24,17 @@ func (r *mysqlDBRepository) CreateWholesaler(record []model.Wholesaler) (result 
 	}
 
 	return record, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) DeleteWholesalerByItemId(itemId int32) (result []model.Wholesaler, RowsAffected int64, err error) {
+	db := r.mysql.Model(&model.Item{}).First(&result, itemId)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrNotFound
+	}
+
+	if err := db.Where("item_id = ?", itemId).Delete(&result).Error; err != nil {
+		return nil, -1, ErrDeleteFailed
+	}
+
+	return result, db.RowsAffected, nil
 }

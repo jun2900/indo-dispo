@@ -104,3 +104,99 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 		Status: "successfully created item",
 	})
 }
+
+// @Summary Update Item
+// @Tags Item
+// @Accept  json
+// @Produce  json
+// @Param  itemId path int true "item id"
+// @Param  input body entity.UpdateItemReq true "update item request"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /item/{itemId} [put]
+func (i *ItemController) UpdateItem(c *fiber.Ctx) error {
+	functionName := "UpdateItem"
+
+	var input entity.UpdateItemReq
+
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing item input, details = %v", err),
+		})
+	}
+
+	itemId, err := c.ParamsInt("itemId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing params item id, details = %v", err),
+		})
+	}
+
+	if len(input.Name) < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "item name cannot be empty",
+		})
+	}
+
+	if len(input.Unit) < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "item unit cannot be empty",
+		})
+	}
+
+	if len(input.Description) < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "item description cannot be empty",
+		})
+	}
+
+	_, _, err = i.itemService.UpdateItem(int32(itemId), &model.Item{
+		ItemName:          input.Name,
+		ItemDescription:   &input.Description,
+		ItemPurchasePrice: input.PurchasePrice,
+		ItemSellPrice:     input.SellPrice,
+		ItemUnit:          input.Unit,
+	})
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on updating item, details = %v", err),
+		})
+	}
+
+	if len(input.WholeSalers) > 0 {
+		_, _, err := i.wholesalerService.DeleteWholesalerByItemId(int32(itemId))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on deleting wholesaler by item id, details = %v", err),
+			})
+		}
+
+		var modelWholeSalers []model.Wholesaler
+		for _, ws := range input.WholeSalers {
+			modelWholeSalers = append(modelWholeSalers, model.Wholesaler{
+				ItemID:          int32(itemId),
+				WholesalerQty:   ws.Qty,
+				WholesalerPrice: ws.Price,
+			})
+		}
+		_, _, err = i.wholesalerService.CreateWholesaler(modelWholeSalers)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on updating wholesaler, details = %v", err),
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{
+		Status: "successfully updated item",
+	})
+}

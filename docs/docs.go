@@ -299,6 +299,58 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/item/{itemId}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Item"
+                ],
+                "summary": "Update Item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "item id",
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "update item request",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateItemReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/ping": {
             "get": {
                 "description": "do ping",
@@ -704,6 +756,9 @@ const docTemplate_swagger = `{
                 "item_description": {
                     "type": "string"
                 },
+                "item_id": {
+                    "type": "integer"
+                },
                 "item_name": {
                     "type": "string"
                 },
@@ -787,6 +842,32 @@ const docTemplate_swagger = `{
                 },
                 "supplier_web": {
                     "type": "string"
+                }
+            }
+        },
+        "entity.UpdateItemReq": {
+            "type": "object",
+            "properties": {
+                "item_description": {
+                    "type": "string"
+                },
+                "item_name": {
+                    "type": "string"
+                },
+                "item_purchase_price": {
+                    "type": "integer"
+                },
+                "item_sell_price": {
+                    "type": "integer"
+                },
+                "item_unit": {
+                    "type": "string"
+                },
+                "item_wholesalers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.WholeSaler"
+                    }
                 }
             }
         },
