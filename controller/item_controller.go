@@ -196,7 +196,40 @@ func (i *ItemController) UpdateItem(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{
+	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
 		Status: "successfully updated item",
+	})
+}
+
+// @Summary Delete Item
+// @Tags Item
+// @Accept  json
+// @Produce  json
+// @Param  itemId path int true "item id"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /item/{itemId} [delete]
+func (i *ItemController) DeleteItem(c *fiber.Ctx) error {
+	functionName := "DeleteItem"
+
+	itemId, err := c.ParamsInt("itemId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing params item id, details = %v", err),
+		})
+	}
+
+	_, _, err = i.itemService.DeleteItem(int32(itemId))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on deleting item, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
+		Status: "successfully deleted item",
 	})
 }

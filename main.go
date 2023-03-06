@@ -78,6 +78,7 @@ func main() {
 	app.Get("/supplier/:supplierId/items", supplierController.GetItemsBySupplierId)
 	app.Post("/item", itemController.RegisterItem)
 	app.Put("/item/:itemId", itemController.UpdateItem)
+	app.Delete("/item/:itemId", itemController.DeleteItem)
 	app.Post("/bill", billController.CreateBill)
 
 	app.Get("/bills", billController.GetAllBills)

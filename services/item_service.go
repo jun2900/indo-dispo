@@ -13,6 +13,7 @@ type ItemService interface {
 	GetItemByItemName(itemName string) (result *model.Item, err error)
 	GetItemBySupplierId(supplierId int32) (result []model.Item, totalRows int64, err error)
 	UpdateItem(itemId int32, updated *model.Item) (result *model.Item, RowsAffected int64, err error)
+	DeleteItem(itemId int32) (result *model.Item, RowsAffected int64, err error)
 }
 
 func NewItemService(mysqlConnection *gorm.DB) ItemService {
@@ -72,6 +73,19 @@ func (r *mysqlDBRepository) UpdateItem(itemId int32, updated *model.Item) (resul
 	db = db.Save(result)
 	if err = db.Error; err != nil {
 		return nil, -1, ErrUpdateFailed
+	}
+
+	return result, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) DeleteItem(itemId int32) (result *model.Item, RowsAffected int64, err error) {
+	db := r.mysql.Model(&model.Item{}).First(&result, itemId)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrNotFound
+	}
+
+	if err := db.Where("item_id = ?", itemId).Delete(&result).Error; err != nil {
+		return nil, -1, ErrDeleteFailed
 	}
 
 	return result, db.RowsAffected, nil

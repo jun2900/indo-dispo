@@ -415,6 +415,33 @@ paths:
       tags:
       - Item
   /item/{itemId}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: item id
+        in: path
+        name: itemId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Delete Item
+      tags:
+      - Item
     put:
       consumes:
       - application/json

@@ -27,7 +27,7 @@ func (r *mysqlDBRepository) CreateWholesaler(record []model.Wholesaler) (result 
 }
 
 func (r *mysqlDBRepository) DeleteWholesalerByItemId(itemId int32) (result []model.Wholesaler, RowsAffected int64, err error) {
-	db := r.mysql.Model(&model.Item{}).First(&result, itemId)
+	db := r.mysql.Model(&model.Wholesaler{}).Where("item_id = ?", itemId).First(&result)
 	if err = db.Error; err != nil {
 		return nil, -1, ErrNotFound
 	}
