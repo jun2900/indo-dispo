@@ -84,6 +84,7 @@ func main() {
 	app.Get("/bills", billController.GetAllBills)
 	app.Get("/bill/header", billController.GetBillHeader)
 	app.Get("/bill/:billId", billController.GetBillDetail)
+	app.Put("/bill/:billId", billController.UpdateBillStatus)
 
 	app.Post("/admin/login", adminController.Login)
 

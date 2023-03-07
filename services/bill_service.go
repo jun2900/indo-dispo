@@ -12,9 +12,10 @@ type BillService interface {
 	GetBill(billId int32) (result *model.Bill, RowsAffected int64, err error)
 	GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor string) (results []model.VSupplierBill, totalRows int64, err error)
 	CreateBill(record *model.Bill) (result *model.Bill, RowsAffected int64, err error)
-	GetAllDraftBillTotal() (billTotal int32)
+	GetAllMenungguPembayaranBillTotal() (billTotal int32)
 	GetAllOverdueBillTotal() (billTotal int32)
 	GetAllOpenBillTotal() (billTotal int32)
+	UpdateBillStatus(billId int32, billStatus string) (result *model.Bill, RowsAffected int64, err error)
 }
 
 func NewBillService(mysqlConnection *gorm.DB) BillService {
@@ -69,19 +70,34 @@ func (r *mysqlDBRepository) CreateBill(record *model.Bill) (result *model.Bill, 
 	return record, db.RowsAffected, nil
 }
 
-func (r *mysqlDBRepository) GetAllDraftBillTotal() (billTotal int32) {
-	r.mysql.Model(&model.Bill{}).Where("bill_status = ?", "DRAFT").Select("sum(bill_total)").Row().Scan(&billTotal)
+func (r *mysqlDBRepository) GetAllMenungguPembayaranBillTotal() (billTotal int32) {
+	r.mysql.Model(&model.Bill{}).Where("bill_status = ?", "MENUNGGU PEMBAYARAN").Select("sum(bill_total)").Row().Scan(&billTotal)
 	return billTotal
 }
 
 func (r *mysqlDBRepository) GetAllOverdueBillTotal() (billTotal int32) {
 	now := time.Now()
-	r.mysql.Model(&model.Bill{}).Where("bill_due_date <= ?", now).Not("bill_status IN ?", []string{"PAID", "DRAFT", "CANCELLED"}).Select("sum(bill_total)").Row().Scan(&billTotal)
+	r.mysql.Model(&model.Bill{}).Where("bill_due_date <= ?", now).Not("bill_status IN ?", []string{"SUDAH DIBAYAR", "MENUNGGU PEMBAYARAN", "CANCELLED"}).Select("sum(bill_total)").Row().Scan(&billTotal)
 	return billTotal
 }
 
 func (r *mysqlDBRepository) GetAllOpenBillTotal() (billTotal int32) {
 	now := time.Now()
-	r.mysql.Model(&model.Bill{}).Where("bill_due_date >= ?", now).Not("bill_status IN ?", []string{"PAID", "DRAFT", "CANCELLED"}).Select("sum(bill_total)").Row().Scan(&billTotal)
+	r.mysql.Model(&model.Bill{}).Where("bill_due_date >= ?", now).Not("bill_status IN ?", []string{"SUDAH DIBAYAR", "MENUNGGU PEMBAYARAN", "CANCELLED"}).Select("sum(bill_total)").Row().Scan(&billTotal)
 	return billTotal
+}
+func (r *mysqlDBRepository) UpdateBillStatus(billId int32, billStatus string) (result *model.Bill, RowsAffected int64, err error) {
+	result = &model.Bill{}
+	db := r.mysql.First(&result, billId)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrNotFound
+	}
+
+	result.BillStatus = billStatus
+
+	if err := db.Save(&result).Error; err != nil {
+		return nil, -1, err
+	}
+
+	return result, db.RowsAffected, nil
 }

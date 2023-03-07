@@ -44,3 +44,7 @@ type BillHeaderResp struct {
 	Open      int32 `json:"bill_open"`
 	BillDraft int32 `json:"bill_draft"`
 }
+
+type BillUpdateStatusReq struct {
+	Status string `json:"bill_status"`
+}

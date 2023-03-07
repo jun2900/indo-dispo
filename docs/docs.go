@@ -171,6 +171,56 @@ const docTemplate_swagger = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Update Bill Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "bill id",
+                        "name": "billId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "update bill status request (paid/cancelled)",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.BillUpdateStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
             }
         },
         "/bills": {
@@ -746,6 +796,14 @@ const docTemplate_swagger = `{
                 },
                 "bill_overdue": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.BillUpdateStatusReq": {
+            "type": "object",
+            "properties": {
+                "bill_status": {
+                    "type": "string"
                 }
             }
         },

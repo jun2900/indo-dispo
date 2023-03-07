@@ -90,6 +90,11 @@ definitions:
       bill_overdue:
         type: integer
     type: object
+  entity.BillUpdateStatusReq:
+    properties:
+      bill_status:
+        type: string
+    type: object
   entity.ErrRespController:
     properties:
       err_message:
@@ -318,6 +323,39 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Get Bill Details
+      tags:
+      - Bill
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: bill id
+        in: path
+        name: billId
+        required: true
+        type: integer
+      - description: update bill status request (paid/cancelled)
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.BillUpdateStatusReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Update Bill Status
       tags:
       - Bill
   /bill/header:

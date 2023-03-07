@@ -5,6 +5,7 @@ import (
 	"anara/model"
 	"anara/services"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -137,7 +138,7 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		})
 	}
 
-	if supplier.SupplierType != "vendor" {
+	if strings.ToLower(supplier.SupplierType) != "vendor" {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     "supplier is not a vendor",
@@ -164,7 +165,7 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		BillOrderNumber: input.BillOrderNumber,
 		BillDiscount:    input.Discount,
 		BillTotal:       int32(total),
-		BillStatus:      "DRAFT",
+		BillStatus:      "MENUNGGU PEMBAYARAN",
 		BillType:        input.BillType,
 	})
 
@@ -332,6 +333,66 @@ func (b *BillController) GetBillHeader(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(entity.BillHeaderResp{
 		Overdue:   b.billService.GetAllOverdueBillTotal(),
 		Open:      b.billService.GetAllOpenBillTotal(),
-		BillDraft: b.billService.GetAllDraftBillTotal(),
+		BillDraft: b.billService.GetAllMenungguPembayaranBillTotal(),
+	})
+}
+
+// @Summary Update Bill Status
+// @Tags Bill
+// @Accept  json
+// @Produce  json
+// @Param  billId path int true "bill id"
+// @Param  input body entity.BillUpdateStatusReq true "update bill status request (paid/cancelled)"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /bill/{billId} [put]
+func (b *BillController) UpdateBillStatus(c *fiber.Ctx) error {
+	var input entity.BillUpdateStatusReq
+
+	functionName := "UpdateBillStatus"
+
+	billId, err := c.ParamsInt("billId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing bill id, details = %v", err),
+		})
+	}
+
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing item input, details = %v", err),
+		})
+	}
+
+	if strings.ToLower(input.Status) != "paid" && strings.ToLower(input.Status) != "cancelled" {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "status must be paid or cancelled",
+		})
+	}
+
+	if strings.ToLower(input.Status) == "paid" {
+		_, _, err := b.billService.UpdateBillStatus(int32(billId), "SUDAH DIBAYAR")
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on updating bill status, details = %v", err),
+			})
+		}
+	} else {
+		_, _, err := b.billService.UpdateBillStatus(int32(billId), strings.ToUpper(input.Status))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on updating bill status, details = %v", err),
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
+		Status: "success on updating bill",
 	})
 }
