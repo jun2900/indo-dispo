@@ -9,26 +9,29 @@ type AddBillReq struct {
 	BillType        string         `json:"bill_type"`
 	Attachments     []Attachment   `json:"bill_attachments"`
 	Items           []ItemPurchase `json:"bill_items"`
-	Discount        *int32         `json:"bill_discount"`
+	BankName        string         `json:"bill_bank_name"`
+	AccountNumber   string         `json:"bill_account_number"`
+	ShippingCost    int32          `json:"bill_shipping_cost"`
 }
 
 type ItemPurchase struct {
-	ItemId  int32 `json:"item_id"`
-	ItemQty int32 `json:"item_qty"`
+	ItemId       int32  `json:"item_id"`
+	ItemQty      int32  `json:"item_qty"`
+	ItemDiscount *int32 `json:"item_discount"`
 }
 
 type BillDetailsResp struct {
-	StartDate       string       `json:"bill_start_date"`
-	DueDate         string       `json:"bill_due_date"`
-	BillNumber      string       `json:"bill_number"`
-	BillOrderNumber *string      `json:"bill_order_number"`
-	BillType        string       `json:"bill_type"`
-	Attachments     []Attachment `json:"bill_attachments"`
-	Items           []ItemBill   `json:"bill_items"`
-	BillStatus      string       `json:"bill_status"`
-	BillSubTotal    int64        `json:"bill_subtotal"`
-	BillTotal       int64        `json:"bill_total"`
-	BillDiscount    *int32       `json:"bill_discount"`
+	StartDate        string       `json:"bill_start_date"`
+	DueDate          string       `json:"bill_due_date"`
+	BillNumber       string       `json:"bill_number"`
+	BillOrderNumber  *string      `json:"bill_order_number"`
+	BillType         string       `json:"bill_type"`
+	Attachments      []Attachment `json:"bill_attachments"`
+	Items            []ItemBill   `json:"bill_items"`
+	BillStatus       string       `json:"bill_status"`
+	BillSubTotal     int64        `json:"bill_subtotal"`
+	BillTotal        int64        `json:"bill_total"`
+	BillShippingCost int32        `json:"bill_shipping_cost"`
 }
 
 type ItemBill struct {

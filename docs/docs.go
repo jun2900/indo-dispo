@@ -663,14 +663,17 @@ const docTemplate_swagger = `{
         "entity.AddBillReq": {
             "type": "object",
             "properties": {
+                "bill_account_number": {
+                    "type": "string"
+                },
                 "bill_attachments": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/entity.Attachment"
                     }
                 },
-                "bill_discount": {
-                    "type": "integer"
+                "bill_bank_name": {
+                    "type": "string"
                 },
                 "bill_due_date": {
                     "type": "string"
@@ -686,6 +689,9 @@ const docTemplate_swagger = `{
                 },
                 "bill_order_number": {
                     "type": "string"
+                },
+                "bill_shipping_cost": {
+                    "type": "integer"
                 },
                 "bill_start_date": {
                     "type": "string"
@@ -750,9 +756,6 @@ const docTemplate_swagger = `{
                         "$ref": "#/definitions/entity.Attachment"
                     }
                 },
-                "bill_discount": {
-                    "type": "integer"
-                },
                 "bill_due_date": {
                     "type": "string"
                 },
@@ -767,6 +770,9 @@ const docTemplate_swagger = `{
                 },
                 "bill_order_number": {
                     "type": "string"
+                },
+                "bill_shipping_cost": {
+                    "type": "integer"
                 },
                 "bill_start_date": {
                     "type": "string"
@@ -841,6 +847,9 @@ const docTemplate_swagger = `{
         "entity.ItemPurchase": {
             "type": "object",
             "properties": {
+                "item_discount": {
+                    "type": "integer"
+                },
                 "item_id": {
                     "type": "integer"
                 },
@@ -982,42 +991,7 @@ const docTemplate_swagger = `{
             }
         },
         "model.VSupplierBill": {
-            "type": "object",
-            "properties": {
-                "bill_discount": {
-                    "type": "integer"
-                },
-                "bill_due_date": {
-                    "type": "string"
-                },
-                "bill_id": {
-                    "type": "integer"
-                },
-                "bill_number": {
-                    "type": "string"
-                },
-                "bill_order_number": {
-                    "type": "string"
-                },
-                "bill_start_date": {
-                    "type": "string"
-                },
-                "bill_status": {
-                    "type": "string"
-                },
-                "bill_type": {
-                    "type": "string"
-                },
-                "supplier_id": {
-                    "type": "integer"
-                },
-                "supplier_name": {
-                    "type": "string"
-                },
-                "supplier_type": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         }
     }
 }`

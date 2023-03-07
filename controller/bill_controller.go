@@ -121,14 +121,28 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		})
 	}
 
-	if input.Discount != nil {
-		if int(*input.Discount) < 0 && int(*input.Discount) > 100 {
-			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-				SourceFunction: functionName,
-				ErrMessage:     "discount cannot be below 0 or pass 100",
-			})
-		}
+	if len(input.BankName) < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "bank name cannot be empty",
+		})
 	}
+
+	if len(input.AccountNumber) < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "account number cannot be empty",
+		})
+	}
+
+	//if input.Discount != nil {
+	//	if int(*input.Discount) < 0 && int(*input.Discount) > 100 {
+	//		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+	//			SourceFunction: functionName,
+	//			ErrMessage:     "discount cannot be below 0 or pass 100",
+	//		})
+	//	}
+	//}
 
 	supplier, _, err := b.supplierService.GetSupplier(input.SupplierId)
 	if err != nil {
@@ -154,19 +168,21 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 				ErrMessage:     fmt.Sprintf("error on getting item with item id '%d' and supplier id  '%d' details = %v", item.ItemId, input.SupplierId, err),
 			})
 		}
-		total += int(it.ItemPurchasePrice) * int(item.ItemQty)
+		total += int(it.ItemPurchasePrice)*int(item.ItemQty) - (int(it.ItemPurchasePrice) * int(item.ItemQty) * int(*item.ItemDiscount) / 100)
 	}
 
 	bill, _, err := b.billService.CreateBill(&model.Bill{
-		SupplierID:      input.SupplierId,
-		BillStartDate:   startDateTime,
-		BillDueDate:     dueDateTime,
-		BillNumber:      input.BillNumber,
-		BillOrderNumber: input.BillOrderNumber,
-		BillDiscount:    input.Discount,
-		BillTotal:       int32(total),
-		BillStatus:      "MENUNGGU PEMBAYARAN",
-		BillType:        input.BillType,
+		SupplierID:        input.SupplierId,
+		BillStartDate:     startDateTime,
+		BillDueDate:       dueDateTime,
+		BillNumber:        input.BillNumber,
+		BillOrderNumber:   input.BillOrderNumber,
+		BillTotal:         int32(total),
+		BillStatus:        "MENUNGGU PEMBAYARAN",
+		BillType:          input.BillType,
+		BillShippingCost:  input.ShippingCost,
+		BillAccountNumber: input.AccountNumber,
+		BillBankName:      input.BankName,
 	})
 
 	if err != nil {
@@ -200,10 +216,11 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 	var modelItemPurchases []model.ItemPurchase
 	for _, item := range input.Items {
 		modelItemPurchases = append(modelItemPurchases, model.ItemPurchase{
-			ItemID:           item.ItemId,
-			BillID:           bill.BillID,
-			ItemPurchaseQty:  item.ItemQty,
-			ItemPurchaseTime: time.Now(),
+			ItemID:               item.ItemId,
+			BillID:               bill.BillID,
+			ItemPurchaseQty:      item.ItemQty,
+			ItemPurchaseTime:     time.Now(),
+			ItemPurchaseDiscount: item.ItemDiscount,
 		})
 	}
 	_, _, err = b.itemPurchaseService.CreateItemPurchase(modelItemPurchases)
@@ -296,7 +313,7 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 			Description: item.ItemDescription,
 			Qty:         ip.ItemPurchaseQty,
 			Price:       is.ItemPurchasePrice,
-			Amount:      is.ItemPurchasePrice*ip.ItemPurchaseQty - is.ItemPurchasePrice*ip.ItemPurchaseQty**bill.BillDiscount/100,
+			Amount:      is.ItemPurchasePrice*ip.ItemPurchaseQty - is.ItemPurchasePrice*ip.ItemPurchaseQty**ip.ItemPurchaseDiscount/100,
 		})
 	}
 
@@ -308,17 +325,17 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(entity.BillDetailsResp{
-		StartDate:       bill.BillStartDate.Format(layoutTime),
-		DueDate:         bill.BillDueDate.Format(layoutTime),
-		BillNumber:      bill.BillNumber,
-		BillOrderNumber: bill.BillOrderNumber,
-		BillType:        bill.BillType,
-		Attachments:     attachments,
-		Items:           itemBills,
-		BillStatus:      bill.BillStatus,
-		BillSubTotal:    int64(subTotal),
-		BillTotal:       int64(total),
-		BillDiscount:    bill.BillDiscount,
+		StartDate:        bill.BillStartDate.Format(layoutTime),
+		DueDate:          bill.BillDueDate.Format(layoutTime),
+		BillNumber:       bill.BillNumber,
+		BillOrderNumber:  bill.BillOrderNumber,
+		BillType:         bill.BillType,
+		Attachments:      attachments,
+		Items:            itemBills,
+		BillStatus:       bill.BillStatus,
+		BillSubTotal:     int64(subTotal),
+		BillTotal:        int64(total),
+		BillShippingCost: bill.BillShippingCost,
 	})
 }
 

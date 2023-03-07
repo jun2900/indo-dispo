@@ -1,12 +1,14 @@
 definitions:
   entity.AddBillReq:
     properties:
+      bill_account_number:
+        type: string
       bill_attachments:
         items:
           $ref: '#/definitions/entity.Attachment'
         type: array
-      bill_discount:
-        type: integer
+      bill_bank_name:
+        type: string
       bill_due_date:
         type: string
       bill_items:
@@ -17,6 +19,8 @@ definitions:
         type: string
       bill_order_number:
         type: string
+      bill_shipping_cost:
+        type: integer
       bill_start_date:
         type: string
       bill_type:
@@ -58,8 +62,6 @@ definitions:
         items:
           $ref: '#/definitions/entity.Attachment'
         type: array
-      bill_discount:
-        type: integer
       bill_due_date:
         type: string
       bill_items:
@@ -70,6 +72,8 @@ definitions:
         type: string
       bill_order_number:
         type: string
+      bill_shipping_cost:
+        type: integer
       bill_start_date:
         type: string
       bill_status:
@@ -117,6 +121,8 @@ definitions:
     type: object
   entity.ItemPurchase:
     properties:
+      item_discount:
+        type: integer
       item_id:
         type: integer
       item_qty:
@@ -209,29 +215,6 @@ definitions:
         type: integer
     type: object
   model.VSupplierBill:
-    properties:
-      bill_discount:
-        type: integer
-      bill_due_date:
-        type: string
-      bill_id:
-        type: integer
-      bill_number:
-        type: string
-      bill_order_number:
-        type: string
-      bill_start_date:
-        type: string
-      bill_status:
-        type: string
-      bill_type:
-        type: string
-      supplier_id:
-        type: integer
-      supplier_name:
-        type: string
-      supplier_type:
-        type: string
     type: object
 info:
   contact: {}
