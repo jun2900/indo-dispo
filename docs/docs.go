@@ -684,6 +684,9 @@ const docTemplate_swagger = `{
                         "$ref": "#/definitions/entity.ItemPurchase"
                     }
                 },
+                "bill_notes": {
+                    "type": "string"
+                },
                 "bill_number": {
                     "type": "string"
                 },
@@ -991,7 +994,39 @@ const docTemplate_swagger = `{
             }
         },
         "model.VSupplierBill": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "bill_due_date": {
+                    "type": "string"
+                },
+                "bill_id": {
+                    "type": "integer"
+                },
+                "bill_number": {
+                    "type": "string"
+                },
+                "bill_order_number": {
+                    "type": "string"
+                },
+                "bill_start_date": {
+                    "type": "string"
+                },
+                "bill_status": {
+                    "type": "string"
+                },
+                "bill_type": {
+                    "type": "string"
+                },
+                "supplier_id": {
+                    "type": "integer"
+                },
+                "supplier_name": {
+                    "type": "string"
+                },
+                "supplier_type": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`

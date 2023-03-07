@@ -12,6 +12,7 @@ type AddBillReq struct {
 	BankName        string         `json:"bill_bank_name"`
 	AccountNumber   string         `json:"bill_account_number"`
 	ShippingCost    int32          `json:"bill_shipping_cost"`
+	BillNote        *string        `json:"bill_notes"`
 }
 
 type ItemPurchase struct {

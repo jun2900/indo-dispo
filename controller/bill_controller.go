@@ -183,6 +183,7 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		BillShippingCost:  input.ShippingCost,
 		BillAccountNumber: input.AccountNumber,
 		BillBankName:      input.BankName,
+		BillNotes:         input.BillNote,
 	})
 
 	if err != nil {
