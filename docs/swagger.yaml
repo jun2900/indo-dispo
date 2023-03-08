@@ -144,6 +144,19 @@ definitions:
         type: integer
       item_unit:
         type: string
+      wholesalers:
+        items:
+          $ref: '#/definitions/entity.ListWholeSaler'
+        type: array
+    type: object
+  entity.ListWholeSaler:
+    properties:
+      wholesaler_id:
+        type: integer
+      wholesaler_price:
+        type: integer
+      wholesaler_qty:
+        type: integer
     type: object
   entity.LoginReq:
     properties:

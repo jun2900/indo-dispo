@@ -881,6 +881,26 @@ const docTemplate_swagger = `{
                 },
                 "item_unit": {
                     "type": "string"
+                },
+                "wholesalers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ListWholeSaler"
+                    }
+                }
+            }
+        },
+        "entity.ListWholeSaler": {
+            "type": "object",
+            "properties": {
+                "wholesaler_id": {
+                    "type": "integer"
+                },
+                "wholesaler_price": {
+                    "type": "integer"
+                },
+                "wholesaler_qty": {
+                    "type": "integer"
                 }
             }
         },

@@ -16,12 +16,19 @@ type WholeSaler struct {
 }
 
 type ListItemBySupplierResp struct {
-	Id            int32   `json:"item_id"`
-	PurchasePrice int32   `json:"item_purchase_price"`
-	SellPrice     int32   `json:"item_sell_price"`
-	Unit          string  `json:"item_unit"`
-	Name          string  `json:"item_name"`
-	Description   *string `json:"item_description"`
+	Id            int32            `json:"item_id"`
+	PurchasePrice int32            `json:"item_purchase_price"`
+	SellPrice     int32            `json:"item_sell_price"`
+	Unit          string           `json:"item_unit"`
+	Name          string           `json:"item_name"`
+	Description   *string          `json:"item_description"`
+	WholeSaler    []ListWholeSaler `json:"wholesalers"`
+}
+
+type ListWholeSaler struct {
+	Id    int32 `json:"wholesaler_id"`
+	Qty   int32 `json:"wholesaler_qty"`
+	Price int32 `json:"wholesaler_price"`
 }
 
 type UpdateItemReq struct {

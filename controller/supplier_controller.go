@@ -155,6 +155,25 @@ func (s *SupplierController) GetItemsBySupplierId(c *fiber.Ctx) error {
 			})
 		}
 
+		wholeSalerRec, _, err := s.wholesalerService.GetWholesalerByItemId(item.ItemID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on getting wholesalers, details = %v", err),
+			})
+		}
+
+		var wholeSalers []entity.ListWholeSaler
+		if len(wholeSalerRec) > 0 {
+			for _, ws := range wholeSalerRec {
+				wholeSalers = append(wholeSalers, entity.ListWholeSaler{
+					Id:    ws.WholesalerID,
+					Qty:   ws.WholesalerQty,
+					Price: ws.WholesalerPrice,
+				})
+			}
+		}
+
 		resp = append(resp, entity.ListItemBySupplierResp{
 			Id:            is.ItemID,
 			PurchasePrice: is.ItemPurchasePrice,
@@ -162,6 +181,7 @@ func (s *SupplierController) GetItemsBySupplierId(c *fiber.Ctx) error {
 			Unit:          is.ItemUnit,
 			Name:          item.ItemName,
 			Description:   item.ItemDescription,
+			WholeSaler:    wholeSalers,
 		})
 	}
 
