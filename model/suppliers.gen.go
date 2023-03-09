@@ -8,14 +8,20 @@ const TableNameSupplier = "suppliers"
 
 // Supplier mapped from table <suppliers>
 type Supplier struct {
-	SupplierID        int32   `gorm:"column:supplier_id;primaryKey;autoIncrement:true" json:"supplier_id"`
-	SupplierName      string  `gorm:"column:supplier_name;not null" json:"supplier_name"`
-	SupplierEmail     *string `gorm:"column:supplier_email" json:"supplier_email"`
-	SupplierTelephone *string `gorm:"column:supplier_telephone" json:"supplier_telephone"`
-	SupplierWeb       *string `gorm:"column:supplier_web" json:"supplier_web"`
-	SupplierNpwp      *string `gorm:"column:supplier_npwp" json:"supplier_npwp"`
-	SupplierAddress   *string `gorm:"column:supplier_address" json:"supplier_address"`
-	SupplierType      string  `gorm:"column:supplier_type;not null" json:"supplier_type"`
+	SupplierID          int32   `gorm:"column:supplier_id;primaryKey;autoIncrement:true" json:"supplier_id"`
+	SupplierName        string  `gorm:"column:supplier_name;not null" json:"supplier_name"`
+	SupplierEmail       *string `gorm:"column:supplier_email" json:"supplier_email"`
+	SupplierTelephone   *string `gorm:"column:supplier_telephone" json:"supplier_telephone"`
+	SupplierWeb         *string `gorm:"column:supplier_web" json:"supplier_web"`
+	SupplierNpwp        *string `gorm:"column:supplier_npwp" json:"supplier_npwp"`
+	SupplierAddress     *string `gorm:"column:supplier_address" json:"supplier_address"`
+	SupplierType        string  `gorm:"column:supplier_type;not null" json:"supplier_type"`
+	SupplierWhatsapp    *string `gorm:"column:supplier_whatsapp" json:"supplier_whatsapp"`
+	SupplierDescription *string `gorm:"column:supplier_description" json:"supplier_description"`
+	SupplierCity        *string `gorm:"column:supplier_city" json:"supplier_city"`
+	SupplierState       *string `gorm:"column:supplier_state" json:"supplier_state"`
+	SupplierZipCode     *string `gorm:"column:supplier_zip_code" json:"supplier_zip_code"`
+	SupplierCountry     *string `gorm:"column:supplier_country" json:"supplier_country"`
 }
 
 // TableName Supplier's table name

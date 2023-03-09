@@ -956,6 +956,15 @@ const docTemplate_swagger = `{
                 "supplier_address": {
                     "type": "string"
                 },
+                "supplier_city": {
+                    "type": "string"
+                },
+                "supplier_country": {
+                    "type": "string"
+                },
+                "supplier_description": {
+                    "type": "string"
+                },
                 "supplier_email": {
                     "type": "string"
                 },
@@ -965,6 +974,9 @@ const docTemplate_swagger = `{
                 "supplier_npwp": {
                     "type": "string"
                 },
+                "supplier_state": {
+                    "type": "string"
+                },
                 "supplier_telephone": {
                     "type": "string"
                 },
@@ -972,6 +984,12 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "supplier_web": {
+                    "type": "string"
+                },
+                "supplier_whatsapp": {
+                    "type": "string"
+                },
+                "supplier_zip_code": {
                     "type": "string"
                 }
             }

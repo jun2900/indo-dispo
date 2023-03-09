@@ -103,13 +103,19 @@ func (s *SupplierController) RegisterSupplier(c *fiber.Ctx) error {
 	}
 
 	s.supplierService.CreateSupplier(&model.Supplier{
-		SupplierName:      input.Name,
-		SupplierEmail:     input.Email,
-		SupplierTelephone: input.Telephone,
-		SupplierWeb:       input.Web,
-		SupplierNpwp:      input.Npwp,
-		SupplierAddress:   input.Address,
-		SupplierType:      strings.ToUpper(input.Type),
+		SupplierName:        input.Name,
+		SupplierEmail:       input.Email,
+		SupplierTelephone:   input.Telephone,
+		SupplierWeb:         input.Web,
+		SupplierNpwp:        input.Npwp,
+		SupplierAddress:     input.Address,
+		SupplierType:        strings.ToUpper(input.Type),
+		SupplierWhatsapp:    input.Whatsapp,
+		SupplierDescription: input.Description,
+		SupplierCity:        input.City,
+		SupplierState:       input.State,
+		SupplierZipCode:     input.ZipCode,
+		SupplierCountry:     input.Country,
 	})
 
 	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{
