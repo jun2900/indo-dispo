@@ -169,7 +169,7 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 	randNum, _ := rand.Int(rand.Reader, big.NewInt(9000))
 	randNum = randNum.Add(randNum, big.NewInt(1000))
 
-	billNumber := fmt.Sprintf("ids/%s/%d", time.Now().Format("2006-01-02 15:04:05"), randNum)
+	billNumber := fmt.Sprintf("ids/%s/%d", strings.ReplaceAll(time.Now().Format("2006-01-02"), "-", ""), randNum)
 
 	bill, _, err := b.billService.CreateBill(&model.Bill{
 		SupplierID:        input.SupplierId,
