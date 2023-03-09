@@ -193,3 +193,34 @@ func (s *SupplierController) GetItemsBySupplierId(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(resp)
 }
+
+// @Summary Get Details Supplier
+// @Tags Supplier
+// @Accept  json
+// @Produce  json
+// @Param  supplierId path int true "supplier id"
+// @Success 200 {object} model.Supplier
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /supplier/details/{supplierId} [get]
+func (s *SupplierController) GetSupplierDetail(c *fiber.Ctx) error {
+	functionName := "GetSupplierDetail"
+
+	supplierId, err := c.ParamsInt("supplierId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing supplier id, details = %v", err),
+		})
+	}
+
+	supplier, _, err := s.supplierService.GetSupplier(int32(supplierId))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting supplier, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(supplier)
+}

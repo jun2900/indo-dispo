@@ -241,6 +241,37 @@ definitions:
       wholesaler_qty:
         type: integer
     type: object
+  model.Supplier:
+    properties:
+      supplier_address:
+        type: string
+      supplier_city:
+        type: string
+      supplier_country:
+        type: string
+      supplier_description:
+        type: string
+      supplier_email:
+        type: string
+      supplier_id:
+        type: integer
+      supplier_name:
+        type: string
+      supplier_npwp:
+        type: string
+      supplier_state:
+        type: string
+      supplier_telephone:
+        type: string
+      supplier_type:
+        type: string
+      supplier_web:
+        type: string
+      supplier_whatsapp:
+        type: string
+      supplier_zip_code:
+        type: string
+    type: object
   model.VSupplierBill:
     properties:
       bill_due_date:
@@ -631,6 +662,34 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Get All Items By Supplier Id
+      tags:
+      - Supplier
+  /supplier/details/{supplierId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: supplier id
+        in: path
+        name: supplierId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Supplier'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Get Details Supplier
       tags:
       - Supplier
   /suppliers:
