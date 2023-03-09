@@ -16,6 +16,7 @@ type BillService interface {
 	GetAllOverdueBillTotal() (billTotal int32)
 	GetAllOpenBillTotal() (billTotal int32)
 	UpdateBillStatus(billId int32, billStatus string) (result *model.Bill, RowsAffected int64, err error)
+	DeleteBill(billId int32) (err error)
 }
 
 func NewBillService(mysqlConnection *gorm.DB) BillService {
@@ -100,4 +101,11 @@ func (r *mysqlDBRepository) UpdateBillStatus(billId int32, billStatus string) (r
 	}
 
 	return result, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) DeleteBill(billId int32) (err error) {
+	if err := r.mysql.Delete(&model.Bill{}, billId).Error; err != nil {
+		return err
+	}
+	return nil
 }

@@ -221,6 +221,48 @@ const docTemplate_swagger = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "delete bill that are not paid yet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Delete Bill",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "bill id",
+                        "name": "billId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
             }
         },
         "/bills": {
@@ -728,9 +770,6 @@ const docTemplate_swagger = `{
                     }
                 },
                 "bill_notes": {
-                    "type": "string"
-                },
-                "bill_number": {
                     "type": "string"
                 },
                 "bill_order_number": {

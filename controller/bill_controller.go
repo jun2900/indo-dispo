@@ -421,3 +421,65 @@ func (b *BillController) UpdateBillStatus(c *fiber.Ctx) error {
 		Status: "success on updating bill",
 	})
 }
+
+// @Summary Delete Bill
+// @Description delete bill that are not paid yet
+// @Tags Bill
+// @Accept  json
+// @Produce  json
+// @Param  billId path int true "bill id"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /bill/{billId} [delete]
+func (b *BillController) DeleteBill(c *fiber.Ctx) error {
+	functionName := "DeleteBill"
+
+	billId, err := c.ParamsInt("billId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing bill id, details = %v", err),
+		})
+	}
+
+	bill, _, err := b.billService.GetBill(int32(billId))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting bill, details = %v", err),
+		})
+	}
+
+	if strings.ToLower(bill.BillStatus) == "sudah dibayar" {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "bill already been paid",
+		})
+	}
+
+	if err := b.itemPurchaseService.DeleteItemPurchasesByBillId(bill.BillID); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on deleting item purchases by bill id, details = %v", err),
+		})
+	}
+
+	if err := b.attachmentService.DeleteAttachmentByBillId(bill.BillID); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on deleting item purchases by bill id, details = %v", err),
+		})
+	}
+
+	if err := b.billService.DeleteBill(bill.BillID); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on deleting bill, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
+		Status: "success on deleting bill",
+	})
+}

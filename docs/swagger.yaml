@@ -17,8 +17,6 @@ definitions:
         type: array
       bill_notes:
         type: string
-      bill_number:
-        type: string
       bill_order_number:
         type: string
       bill_shipping_cost:
@@ -362,6 +360,34 @@ paths:
       tags:
       - Bill
   /bill/{billId}:
+    delete:
+      consumes:
+      - application/json
+      description: delete bill that are not paid yet
+      parameters:
+      - description: bill id
+        in: path
+        name: billId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Delete Bill
+      tags:
+      - Bill
     get:
       consumes:
       - application/json

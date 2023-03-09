@@ -9,6 +9,7 @@ import (
 type ItemPurchaseService interface {
 	GetAllItemPurchaseByBillId(billId int32) (results []model.ItemPurchase, totalRows int64, err error)
 	CreateItemPurchase(record []model.ItemPurchase) (results []model.ItemPurchase, RowsAffected int64, err error)
+	DeleteItemPurchasesByBillId(billId int32) (err error)
 }
 
 func NewItemPurchaseService(mysqlConnection *gorm.DB) ItemPurchaseService {
@@ -32,4 +33,11 @@ func (r *mysqlDBRepository) CreateItemPurchase(record []model.ItemPurchase) (res
 	}
 
 	return record, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) DeleteItemPurchasesByBillId(billId int32) (err error) {
+	if err := r.mysql.Where("bill_id = ?", billId).Delete(&model.ItemPurchase{}).Error; err != nil {
+		return err
+	}
+	return nil
 }

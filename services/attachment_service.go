@@ -9,6 +9,7 @@ import (
 type AttachmentService interface {
 	GetAttachmentByBillId(billId int32) (results []model.Attachment, totalRows int64, err error)
 	CreateAttachments(record []model.Attachment) (result []model.Attachment, RowsAffected int64, err error)
+	DeleteAttachmentByBillId(billId int32) (err error)
 }
 
 func NewAttachmentService(mysqlConnection *gorm.DB) AttachmentService {
@@ -32,4 +33,11 @@ func (r *mysqlDBRepository) GetAttachmentByBillId(billId int32) (results []model
 	}
 
 	return results, totalRows, nil
+}
+
+func (r *mysqlDBRepository) DeleteAttachmentByBillId(billId int32) (err error) {
+	if err := r.mysql.Where("bill_id = ?", billId).Delete(&model.Attachment{}).Error; err != nil {
+		return err
+	}
+	return nil
 }
