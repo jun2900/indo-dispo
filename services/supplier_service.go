@@ -11,6 +11,7 @@ type SupplierService interface {
 	GetAllSupplierByType(supplierType string, page, pagesize int, order, name, email, address string) (result []*model.Supplier, totalRows int64, err error)
 	CreateSupplier(record *model.Supplier) (result *model.Supplier, RowsAffected int64, err error)
 	GetSupplier(supplierId int32) (result *model.Supplier, RowsAffected int64, err error)
+	GetSupplierBySupplierName(supplierName string) (result *model.Supplier, RowsAffected int64, err error)
 }
 
 func NewSupplierService(mysqlConnection *gorm.DB) SupplierService {
@@ -60,6 +61,14 @@ func (r *mysqlDBRepository) CreateSupplier(record *model.Supplier) (result *mode
 
 func (r *mysqlDBRepository) GetSupplier(supplierId int32) (result *model.Supplier, RowsAffected int64, err error) {
 	db := r.mysql.First(&result, supplierId)
+	if err = db.Error; err != nil {
+		return nil, -1, err
+	}
+	return result, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) GetSupplierBySupplierName(supplierName string) (result *model.Supplier, RowsAffected int64, err error) {
+	db := r.mysql.Where("supplier_name = ?", supplierName).First(&result)
 	if err = db.Error; err != nil {
 		return nil, -1, err
 	}

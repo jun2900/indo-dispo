@@ -95,6 +95,14 @@ func (s *SupplierController) RegisterSupplier(c *fiber.Ctx) error {
 		})
 	}
 
+	_, _, err := s.supplierService.GetSupplierBySupplierName(input.Name)
+	if err == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "supplier already exist",
+		})
+	}
+
 	if strings.ToLower(input.Type) != "vendor" && strings.ToLower(input.Type) != "customer" {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
