@@ -4,7 +4,9 @@ import (
 	"anara/entity"
 	"anara/model"
 	"anara/services"
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"strings"
 	"time"
 
@@ -107,13 +109,6 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		})
 	}
 
-	if len(input.BillNumber) < 1 {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "bill number cannot be empty",
-		})
-	}
-
 	if len(input.Items) < 1 {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
@@ -171,12 +166,17 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		total += int(it.ItemPurchasePrice)*int(item.ItemQty) - (int(it.ItemPurchasePrice) * int(item.ItemQty) * int(*item.ItemDiscount) / 100)
 	}
 
+	randNum, _ := rand.Int(rand.Reader, big.NewInt(9000))
+	randNum = randNum.Add(randNum, big.NewInt(1000))
+
+	billNumber := fmt.Sprintf("ids/%s/%d", time.Now().Format("2006-01-02 15:04:05"), randNum)
+
 	bill, _, err := b.billService.CreateBill(&model.Bill{
 		SupplierID:        input.SupplierId,
 		BillStartDate:     startDateTime,
 		BillDueDate:       dueDateTime,
-		BillNumber:        input.BillNumber,
-		BillOrderNumber:   input.BillOrderNumber,
+		BillNumber:        billNumber,
+		BillOrderNumber:   nil,
 		BillTotal:         int32(total),
 		BillStatus:        "MENUNGGU PEMBAYARAN",
 		BillType:          input.BillType,

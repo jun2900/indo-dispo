@@ -4,7 +4,6 @@ type AddBillReq struct {
 	SupplierId      int32          `json:"supplier_id"`
 	StartDate       string         `json:"bill_start_date"`
 	DueDate         string         `json:"bill_due_date"`
-	BillNumber      string         `json:"bill_number"`
 	BillOrderNumber *string        `json:"bill_order_number"`
 	BillType        string         `json:"bill_type"`
 	Attachments     []Attachment   `json:"bill_attachments"`
