@@ -252,7 +252,7 @@
                     },
                     {
                         "type": "string",
-                        "description": "filter by bill vendor",
+                        "description": "filter by supplier name",
                         "name": "vendor",
                         "in": "query"
                     }
@@ -1131,6 +1131,9 @@
                 },
                 "bill_status": {
                     "type": "string"
+                },
+                "bill_total": {
+                    "type": "integer"
                 },
                 "bill_type": {
                     "type": "string"

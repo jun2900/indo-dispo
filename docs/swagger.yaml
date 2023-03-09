@@ -286,6 +286,8 @@ definitions:
         type: string
       bill_status:
         type: string
+      bill_total:
+        type: integer
       bill_type:
         type: string
       supplier_id:
@@ -456,7 +458,7 @@ paths:
         in: query
         name: status
         type: string
-      - description: filter by bill vendor
+      - description: filter by supplier name
         in: query
         name: vendor
         type: string

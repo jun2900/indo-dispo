@@ -262,7 +262,7 @@ const docTemplate_swagger = `{
                     },
                     {
                         "type": "string",
-                        "description": "filter by bill vendor",
+                        "description": "filter by supplier name",
                         "name": "vendor",
                         "in": "query"
                     }
@@ -1141,6 +1141,9 @@ const docTemplate_swagger = `{
                 },
                 "bill_status": {
                     "type": "string"
+                },
+                "bill_total": {
+                    "type": "integer"
                 },
                 "bill_type": {
                     "type": "string"

@@ -39,7 +39,7 @@ func NewBillController(supplierService services.SupplierService, billService ser
 // @Param       pagesize 				query    int    false "number of records in a page  (defaults to 20)"
 // @Param       order    				query    string false "asc / desc"
 // @Param status query string false "filter by bill status"
-// @Param vendor query string false "filter by bill vendor"
+// @Param vendor query string false "filter by supplier name"
 // @Success 200 {object} entity.PagedResults{Data=[]model.VSupplierBill}
 // @Failure 400 {object} entity.ErrRespController
 // @Failure 500 {object} entity.ErrRespController
@@ -309,12 +309,19 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 			})
 		}
 
+		var amount int32
+		if ip.ItemPurchaseDiscount != nil {
+			amount = is.ItemPurchasePrice*ip.ItemPurchaseQty - is.ItemPurchasePrice*ip.ItemPurchaseQty**ip.ItemPurchaseDiscount/100
+		} else {
+			amount = is.ItemPurchasePrice * ip.ItemPurchaseQty
+		}
+
 		itemBills = append(itemBills, entity.ItemBill{
 			Name:        item.ItemName,
 			Description: item.ItemDescription,
 			Qty:         ip.ItemPurchaseQty,
 			Price:       is.ItemPurchasePrice,
-			Amount:      is.ItemPurchasePrice*ip.ItemPurchaseQty - is.ItemPurchasePrice*ip.ItemPurchaseQty**ip.ItemPurchaseDiscount/100,
+			Amount:      amount,
 		})
 	}
 
