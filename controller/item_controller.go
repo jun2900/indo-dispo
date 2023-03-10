@@ -56,7 +56,7 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 		})
 	}
 
-	item, err := i.itemService.GetItemByItemName(input.Name)
+	item, _ := i.itemService.GetItemByItemName(input.Name)
 	if item != nil {
 		_, err := i.itemService.GetItemWithItemIdAndSupplierId(item.ItemID, input.SupplierId)
 		if err == nil {
@@ -65,21 +65,20 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 				ErrMessage:     "a supplier cannot have the same item",
 			})
 		}
-	} else if err != nil {
-		item, _, err = i.itemService.CreateItem(&model.Item{
-			SupplierID:        input.SupplierId,
-			ItemName:          input.Name,
-			ItemDescription:   input.Description,
-			ItemPurchasePrice: input.PurchasePrice,
-			ItemSellPrice:     input.SellPrice,
-			ItemUnit:          input.Unit,
+	}
+	item, _, err := i.itemService.CreateItem(&model.Item{
+		SupplierID:        input.SupplierId,
+		ItemName:          input.Name,
+		ItemDescription:   input.Description,
+		ItemPurchasePrice: input.PurchasePrice,
+		ItemSellPrice:     input.SellPrice,
+		ItemUnit:          input.Unit,
+	})
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on registering item, details = %v", err),
 		})
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
-				SourceFunction: functionName,
-				ErrMessage:     fmt.Sprintf("error on registering item, details = %v", err),
-			})
-		}
 	}
 
 	if len(input.WholeSalers) > 0 {
