@@ -220,6 +220,19 @@ definitions:
       supplier_zip_code:
         type: string
     type: object
+  entity.UpdateBalanceAmountReq:
+    properties:
+      balance_amount:
+        type: number
+      balance_attachment:
+        items:
+          type: integer
+        type: array
+      balance_date_added:
+        type: string
+      balance_notes:
+        type: string
+    type: object
   entity.UpdateItemReq:
     properties:
       item_description:
@@ -333,6 +346,35 @@ paths:
       summary: Login
       tags:
       - Admin Auth
+  /balance:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: add balance req
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateBalanceAmountReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Add Balance Amount
+      tags:
+      - Balance
   /balance/header:
     get:
       consumes:

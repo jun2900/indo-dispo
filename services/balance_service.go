@@ -8,6 +8,7 @@ import (
 
 type BalanceService interface {
 	GetBalance(balanceId int32) (result *model.Balance, RowsAffected int64, err error)
+	UpdateBalanceAmount(balanceId int32, BalanceAmount float64) (result *model.Balance, RowsAffected int64, err error)
 }
 
 func NewBalanceService(mysqlConnection *gorm.DB) BalanceService {
@@ -21,5 +22,21 @@ func (r *mysqlDBRepository) GetBalance(balanceId int32) (result *model.Balance, 
 	if err = db.Error; err != nil {
 		return nil, -1, err
 	}
+	return result, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) UpdateBalanceAmount(balanceId int32, BalanceAmount float64) (result *model.Balance, RowsAffected int64, err error) {
+	result = &model.Balance{}
+	db := r.mysql.First(&result, balanceId)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrNotFound
+	}
+
+	result.BalanceAmount = BalanceAmount
+
+	if err := db.Save(&result).Error; err != nil {
+		return nil, -1, err
+	}
+
 	return result, db.RowsAffected, nil
 }

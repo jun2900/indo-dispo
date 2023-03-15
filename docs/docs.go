@@ -62,6 +62,51 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/balance": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Balance"
+                ],
+                "summary": "Add Balance Amount",
+                "parameters": [
+                    {
+                        "description": "add balance req",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateBalanceAmountReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/balance/header": {
             "get": {
                 "description": "get balance in net amount (balance - paid bills)",
@@ -1109,6 +1154,26 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "supplier_zip_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.UpdateBalanceAmountReq": {
+            "type": "object",
+            "properties": {
+                "balance_amount": {
+                    "type": "number"
+                },
+                "balance_attachment": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "balance_date_added": {
+                    "type": "string"
+                },
+                "balance_notes": {
                     "type": "string"
                 }
             }
