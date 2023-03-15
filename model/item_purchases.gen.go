@@ -17,7 +17,7 @@ type ItemPurchase struct {
 	BillID               int32     `gorm:"column:bill_id;not null" json:"bill_id"`
 	ItemPurchaseQty      int32     `gorm:"column:item_purchase_qty;not null" json:"item_purchase_qty"`
 	ItemPurchaseTime     time.Time `gorm:"column:item_purchase_time;not null" json:"item_purchase_time"`
-	ItemPurchaseDiscount *int32    `gorm:"column:item_purchase_discount" json:"item_purchase_discount"`
+	ItemPurchaseDiscount *float64  `gorm:"column:item_purchase_discount" json:"item_purchase_discount"`
 }
 
 // TableName ItemPurchase's table name

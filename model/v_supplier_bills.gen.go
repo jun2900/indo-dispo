@@ -22,7 +22,7 @@ type VSupplierBill struct {
 	BillType        string    `gorm:"column:bill_type;not null" json:"bill_type"`
 	SupplierName    string    `gorm:"column:supplier_name;not null" json:"supplier_name"`
 	SupplierType    string    `gorm:"column:supplier_type;not null" json:"supplier_type"`
-	BillTotal       int32     `gorm:"column:bill_total;not null" json:"bill_total"`
+	BillTotal       float64   `gorm:"column:bill_total;not null" json:"bill_total"`
 }
 
 // TableName VSupplierBill's table name

@@ -20,7 +20,7 @@ definitions:
       bill_order_number:
         type: string
       bill_shipping_cost:
-        type: integer
+        type: number
       bill_start_date:
         type: string
       bill_type:
@@ -35,9 +35,9 @@ definitions:
       item_name:
         type: string
       item_purchase_price:
-        type: integer
+        type: number
       item_sell_price:
-        type: integer
+        type: number
       item_unit:
         type: string
       item_wholesalers:
@@ -73,7 +73,7 @@ definitions:
       bill_order_number:
         type: string
       bill_shipping_cost:
-        type: integer
+        type: number
       bill_start_date:
         type: string
       bill_status:
@@ -88,11 +88,11 @@ definitions:
   entity.BillHeaderResp:
     properties:
       bill_draft:
-        type: integer
+        type: number
       bill_open:
-        type: integer
+        type: number
       bill_overdue:
-        type: integer
+        type: number
     type: object
   entity.BillUpdateStatusReq:
     properties:
@@ -106,23 +106,28 @@ definitions:
       source_function:
         type: string
     type: object
+  entity.GetBalanceAmountResp:
+    properties:
+      net_amount:
+        type: number
+    type: object
   entity.ItemBill:
     properties:
       item_amount:
-        type: integer
+        type: number
       item_description:
         type: string
       item_name:
         type: string
       item_price:
-        type: integer
+        type: number
       item_qty:
         type: integer
     type: object
   entity.ItemPurchase:
     properties:
       item_discount:
-        type: integer
+        type: number
       item_id:
         type: integer
       item_qty:
@@ -137,9 +142,9 @@ definitions:
       item_name:
         type: string
       item_purchase_price:
-        type: integer
+        type: number
       item_sell_price:
-        type: integer
+        type: number
       item_unit:
         type: string
       wholesalers:
@@ -152,7 +157,7 @@ definitions:
       wholesaler_id:
         type: integer
       wholesaler_price:
-        type: integer
+        type: number
       wholesaler_qty:
         type: integer
     type: object
@@ -222,9 +227,9 @@ definitions:
       item_name:
         type: string
       item_purchase_price:
-        type: integer
+        type: number
       item_sell_price:
-        type: integer
+        type: number
       item_unit:
         type: string
       item_wholesalers:
@@ -235,7 +240,7 @@ definitions:
   entity.WholeSaler:
     properties:
       wholesaler_price:
-        type: integer
+        type: number
       wholesaler_qty:
         type: integer
     type: object
@@ -244,8 +249,6 @@ definitions:
       supplier_address:
         type: string
       supplier_city:
-        type: string
-      supplier_country:
         type: string
       supplier_description:
         type: string
@@ -285,7 +288,7 @@ definitions:
       bill_status:
         type: string
       bill_total:
-        type: integer
+        type: number
       bill_type:
         type: string
       supplier_id:
@@ -330,6 +333,25 @@ paths:
       summary: Login
       tags:
       - Admin Auth
+  /balance/header:
+    get:
+      consumes:
+      - application/json
+      description: get balance in net amount (balance - paid bills)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.GetBalanceAmountResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Get Balance Header
+      tags:
+      - Balance
   /bill:
     post:
       consumes:

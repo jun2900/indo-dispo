@@ -116,6 +116,13 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		})
 	}
 
+	if !strings.EqualFold(input.BillType, "raw") && !strings.EqualFold(input.BillType, "operasional") {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "bill type must be `raw` or `operasional`",
+		})
+	}
+
 	if len(input.BankName) < 1 {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
@@ -154,7 +161,8 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		})
 	}
 
-	total := 0
+	var total float64
+	total = 0
 	for _, item := range input.Items {
 		it, err := b.itemService.GetItemWithItemIdAndSupplierId(item.ItemId, input.SupplierId)
 		if err != nil {
@@ -163,13 +171,13 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 				ErrMessage:     fmt.Sprintf("error on getting item with item id '%d' and supplier id  '%d' details = %v", item.ItemId, input.SupplierId, err),
 			})
 		}
-		total += int(it.ItemPurchasePrice)*int(item.ItemQty) - (int(it.ItemPurchasePrice) * int(item.ItemQty) * int(*item.ItemDiscount) / 100)
+		total += it.ItemPurchasePrice*float64(item.ItemQty) - it.ItemPurchasePrice*float64(item.ItemQty)**item.ItemDiscount/100
 	}
 
 	randNum, _ := rand.Int(rand.Reader, big.NewInt(9000))
 	randNum = randNum.Add(randNum, big.NewInt(1000))
 
-	billNumber := fmt.Sprintf("ids/%s/%d", strings.ReplaceAll(time.Now().Format("2006-01-02"), "-", ""), randNum)
+	billNumber := fmt.Sprintf("IDS/%s/%d", strings.ReplaceAll(time.Now().Format("2006-01-02"), "-", ""), randNum)
 
 	bill, _, err := b.billService.CreateBill(&model.Bill{
 		SupplierID:        input.SupplierId,
@@ -177,7 +185,7 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		BillDueDate:       dueDateTime,
 		BillNumber:        billNumber,
 		BillOrderNumber:   nil,
-		BillTotal:         int32(total),
+		BillTotal:         total,
 		BillStatus:        "MENUNGGU PEMBAYARAN",
 		BillType:          input.BillType,
 		BillShippingCost:  input.ShippingCost,
@@ -309,11 +317,11 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 			})
 		}
 
-		var amount int32
+		var amount float64
 		if ip.ItemPurchaseDiscount != nil {
-			amount = is.ItemPurchasePrice*ip.ItemPurchaseQty - is.ItemPurchasePrice*ip.ItemPurchaseQty**ip.ItemPurchaseDiscount/100
+			amount = is.ItemPurchasePrice*float64(ip.ItemPurchaseQty) - is.ItemPurchasePrice*float64(ip.ItemPurchaseQty)**ip.ItemPurchaseDiscount/100
 		} else {
-			amount = is.ItemPurchasePrice * ip.ItemPurchaseQty
+			amount = is.ItemPurchasePrice * float64(ip.ItemPurchaseQty)
 		}
 
 		itemBills = append(itemBills, entity.ItemBill{

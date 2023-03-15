@@ -21,7 +21,6 @@ type Supplier struct {
 	SupplierCity        *string `gorm:"column:supplier_city" json:"supplier_city"`
 	SupplierState       *string `gorm:"column:supplier_state" json:"supplier_state"`
 	SupplierZipCode     *string `gorm:"column:supplier_zip_code" json:"supplier_zip_code"`
-	SupplierCountry     *string `gorm:"column:supplier_country" json:"supplier_country"`
 }
 
 // TableName Supplier's table name

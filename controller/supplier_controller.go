@@ -123,7 +123,6 @@ func (s *SupplierController) RegisterSupplier(c *fiber.Ctx) error {
 		SupplierCity:        input.City,
 		SupplierState:       input.State,
 		SupplierZipCode:     input.ZipCode,
-		SupplierCountry:     input.Country,
 	})
 
 	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{

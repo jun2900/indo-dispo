@@ -54,12 +54,14 @@ func main() {
 	attachmentService := services.NewAttachmentService(DB)
 	adminService := services.NewAdminService(DB)
 	wholesalerService := services.NewWholesalerService(DB)
+	balanceService := services.NewBalanceService(DB)
 
 	//controllers
 	supplierController := controller.NewSupplierController(supplierService, wholesalerService, itemService)
 	itemController := controller.NewItemController(itemService, wholesalerService)
 	billController := controller.NewBillController(supplierService, billService, itemPurchaseService, itemService, attachmentService)
 	adminController := controller.NewAuthController(adminService)
+	balanceController := controller.NewBalanceController(balanceService, billService)
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
@@ -87,6 +89,8 @@ func main() {
 	app.Get("/bill/:billId", billController.GetBillDetail)
 	app.Put("/bill/:billId", billController.UpdateBillStatus)
 	app.Delete("/bill/:billId", billController.DeleteBill)
+
+	app.Get("/balance/header", balanceController.GetNetBalanceAmount)
 
 	app.Post("/admin/login", adminController.Login)
 

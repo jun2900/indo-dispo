@@ -62,6 +62,35 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/balance/header": {
+            "get": {
+                "description": "get balance in net amount (balance - paid bills)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Balance"
+                ],
+                "summary": "Get Balance Header",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.GetBalanceAmountResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/bill": {
             "post": {
                 "consumes": [
@@ -776,7 +805,7 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "bill_shipping_cost": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "bill_start_date": {
                     "type": "string"
@@ -799,10 +828,10 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "item_purchase_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_sell_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_unit": {
                     "type": "string"
@@ -857,7 +886,7 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "bill_shipping_cost": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "bill_start_date": {
                     "type": "string"
@@ -880,13 +909,13 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "bill_draft": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "bill_open": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "bill_overdue": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -909,11 +938,19 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "entity.GetBalanceAmountResp": {
+            "type": "object",
+            "properties": {
+                "net_amount": {
+                    "type": "number"
+                }
+            }
+        },
         "entity.ItemBill": {
             "type": "object",
             "properties": {
                 "item_amount": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_description": {
                     "type": "string"
@@ -922,7 +959,7 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "item_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_qty": {
                     "type": "integer"
@@ -933,7 +970,7 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "item_discount": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_id": {
                     "type": "integer"
@@ -956,10 +993,10 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "item_purchase_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_sell_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_unit": {
                     "type": "string"
@@ -979,7 +1016,7 @@ const docTemplate_swagger = `{
                     "type": "integer"
                 },
                 "wholesaler_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "wholesaler_qty": {
                     "type": "integer"
@@ -1086,10 +1123,10 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "item_purchase_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_sell_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "item_unit": {
                     "type": "string"
@@ -1106,7 +1143,7 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "wholesaler_price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "wholesaler_qty": {
                     "type": "integer"
@@ -1120,9 +1157,6 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "supplier_city": {
-                    "type": "string"
-                },
-                "supplier_country": {
                     "type": "string"
                 },
                 "supplier_description": {
@@ -1182,7 +1216,7 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "bill_total": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "bill_type": {
                     "type": "string"
