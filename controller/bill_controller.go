@@ -13,7 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var layoutTime = "2006-01-02 15:04:05"
+var layoutTime = "2006-01-02"
 
 type BillController struct {
 	supplierService     services.SupplierService
@@ -226,7 +226,8 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 	for _, item := range input.Items {
 		modelItemPurchases = append(modelItemPurchases, model.ItemPurchase{
 			ItemID:               item.ItemId,
-			BillID:               bill.BillID,
+			BillID:               &bill.BillID,
+			RecurringBillID:      nil,
 			ItemPurchaseQty:      item.ItemQty,
 			ItemPurchaseTime:     time.Now(),
 			ItemPurchaseDiscount: item.ItemDiscount,

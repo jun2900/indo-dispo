@@ -56,6 +56,7 @@ func main() {
 	wholesalerService := services.NewWholesalerService(DB)
 	balanceService := services.NewBalanceService(DB)
 	balanceLogService := services.NewBalanceLogService(DB)
+	recurringBillService := services.NewRecurringBillService(DB)
 
 	//controllers
 	supplierController := controller.NewSupplierController(supplierService, wholesalerService, itemService)
@@ -63,6 +64,7 @@ func main() {
 	billController := controller.NewBillController(supplierService, billService, itemPurchaseService, itemService, attachmentService)
 	adminController := controller.NewAuthController(adminService)
 	balanceController := controller.NewBalanceController(balanceService, billService, balanceLogService)
+	recurringBillController := controller.NewRecurringBillController(recurringBillService, itemPurchaseService, supplierService, itemService, attachmentService)
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
@@ -93,6 +95,8 @@ func main() {
 
 	app.Get("/balance/header", balanceController.GetNetBalanceAmount)
 	app.Put("/balance", balanceController.AddBalanceAmount)
+
+	app.Post("/recurring_bill", recurringBillController.AddRecurringBill)
 
 	app.Post("/admin/login", adminController.Login)
 

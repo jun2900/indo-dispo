@@ -8,11 +8,12 @@ const TableNameAttachment = "attachments"
 
 // Attachment mapped from table <attachments>
 type Attachment struct {
-	AttachmentID   int32  `gorm:"column:attachment_id;primaryKey;autoIncrement:true" json:"attachment_id"`
-	BillID         *int32 `gorm:"column:bill_id" json:"bill_id"`
-	InvoiceID      *int32 `gorm:"column:invoice_id" json:"invoice_id"`
-	AttachmentName string `gorm:"column:attachment_name;not null" json:"attachment_name"`
-	AttachmentFile []byte `gorm:"column:attachment_file;not null" json:"attachment_file"`
+	AttachmentID    int32  `gorm:"column:attachment_id;primaryKey;autoIncrement:true" json:"attachment_id"`
+	BillID          *int32 `gorm:"column:bill_id" json:"bill_id"`
+	RecurringBillID *int32 `gorm:"column:recurring_bill_id" json:"recurring_bill_id"`
+	InvoiceID       *int32 `gorm:"column:invoice_id" json:"invoice_id"`
+	AttachmentName  string `gorm:"column:attachment_name;not null" json:"attachment_name"`
+	AttachmentFile  []byte `gorm:"column:attachment_file;not null" json:"attachment_file"`
 }
 
 // TableName Attachment's table name

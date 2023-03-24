@@ -8,7 +8,7 @@ const TableNameBalance = "balances"
 
 // Balance mapped from table <balances>
 type Balance struct {
-	BalanceID     int32   `gorm:"column:balance_id;primaryKey;autoIncrement:false" json:"balance_id"`
+	BalanceID     int32   `gorm:"column:balance_id;primaryKey;autoIncrement:true" json:"balance_id"`
 	BalanceAmount float64 `gorm:"column:balance_amount;not null" json:"balance_amount"`
 }
 

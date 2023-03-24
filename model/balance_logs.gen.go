@@ -12,7 +12,7 @@ const TableNameBalanceLog = "balance_logs"
 
 // BalanceLog mapped from table <balance_logs>
 type BalanceLog struct {
-	BalanceLogID         int32     `gorm:"column:balance_log_id;primaryKey;autoIncrement:false" json:"balance_log_id"`
+	BalanceLogID         int32     `gorm:"column:balance_log_id;primaryKey;autoIncrement:true" json:"balance_log_id"`
 	BalanceLogAmount     float64   `gorm:"column:balance_log_amount;not null" json:"balance_log_amount"`
 	BalanceLogNotes      *string   `gorm:"column:balance_log_notes" json:"balance_log_notes"`
 	BalanceLogAttachment *[]byte   `gorm:"column:balance_log_attachment" json:"balance_log_attachment"`

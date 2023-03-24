@@ -41,11 +41,11 @@ func OpenDbConnection() *gorm.DB {
 		},
 	)
 
-	username := os.Getenv("DB_USER")     //utility.KVGet("DB_USER")
-	password := os.Getenv("DB_PASSWORD") //utility.KVGet("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")       //utility.KVGet("DB_NAME")
-	host := os.Getenv("DB_HOST")         //utility.KVGet("DB_HOST")
-	port := os.Getenv("DB_PORT")         //utility.KVGet("DB_PORT")
+	username := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
 	var db *gorm.DB
 	var err error
 

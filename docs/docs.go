@@ -602,6 +602,51 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/recurring_bill": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Recurring Bill"
+                ],
+                "summary": "Register Recurring Bill",
+                "parameters": [
+                    {
+                        "description": "add recurring bill request",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.AddRecurringBillReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/supplier": {
             "post": {
                 "description": "register supplier (vendor or customer)",
@@ -886,6 +931,47 @@ const docTemplate_swagger = `{
                     "items": {
                         "$ref": "#/definitions/entity.WholeSaler"
                     }
+                },
+                "supplier_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.AddRecurringBillReq": {
+            "type": "object",
+            "properties": {
+                "bill_attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Attachment"
+                    }
+                },
+                "recurring_bill_account_number": {
+                    "type": "string"
+                },
+                "recurring_bill_bank_name": {
+                    "type": "string"
+                },
+                "recurring_bill_end_date": {
+                    "type": "string"
+                },
+                "recurring_bill_frequency": {
+                    "type": "string"
+                },
+                "recurring_bill_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ItemPurchase"
+                    }
+                },
+                "recurring_bill_notes": {
+                    "type": "string"
+                },
+                "recurring_bill_shipping_cost": {
+                    "type": "number"
+                },
+                "recurring_bill_start_date": {
+                    "type": "string"
                 },
                 "supplier_id": {
                     "type": "integer"
