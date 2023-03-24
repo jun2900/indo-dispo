@@ -67,6 +67,8 @@ definitions:
         type: array
       recurring_bill_notes:
         type: string
+      recurring_bill_payment_due:
+        type: integer
       recurring_bill_shipping_cost:
         type: number
       recurring_bill_start_date:
@@ -178,6 +180,31 @@ definitions:
         items:
           $ref: '#/definitions/entity.ListWholeSaler'
         type: array
+    type: object
+  entity.ListSupplierByItemDetails:
+    properties:
+      item_description:
+        type: string
+      item_purchase_price:
+        type: number
+      item_sell_price:
+        type: number
+      supplier_name:
+        type: string
+    type: object
+  entity.ListSupplierByItemReq:
+    properties:
+      item_name:
+        type: string
+    type: object
+  entity.ListSupplierByItemResp:
+    properties:
+      details:
+        items:
+          $ref: '#/definitions/entity.ListSupplierByItemDetails'
+        type: array
+      item_name:
+        type: string
     type: object
   entity.ListWholeSaler:
     properties:
@@ -838,6 +865,35 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Get Details Supplier
+      tags:
+      - Supplier
+  /supplier/items:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: list supplier by item req
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.ListSupplierByItemReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.ListSupplierByItemResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Get Supplier and Item Detail by Item Name
       tags:
       - Supplier
   /suppliers:

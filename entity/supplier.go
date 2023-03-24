@@ -15,3 +15,18 @@ type SupplierAddReq struct {
 	ZipCode     *string `json:"supplier_zip_code"`
 	Country     *string `json:"supplier_country"`
 }
+
+type ListSupplierByItemReq struct {
+	ItemName string `json:"item_name"`
+}
+
+type ListSupplierByItemDetails struct {
+	SupplierName  string  `json:"supplier_name"`
+	Description   *string `json:"item_description"`
+	PurchasePrice float64 `json:"item_purchase_price"`
+	SellPrice     float64 `json:"item_sell_price"`
+}
+type ListSupplierByItemResp struct {
+	ItemName string                      `json:"item_name"`
+	Data     []ListSupplierByItemDetails `json:"details"`
+}

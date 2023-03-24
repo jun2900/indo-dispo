@@ -736,6 +736,51 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/supplier/items": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Supplier"
+                ],
+                "summary": "Get Supplier and Item Detail by Item Name",
+                "parameters": [
+                    {
+                        "description": "list supplier by item req",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.ListSupplierByItemReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ListSupplierByItemResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/supplier/{supplierId}/items": {
             "get": {
                 "consumes": [
@@ -967,6 +1012,9 @@ const docTemplate_swagger = `{
                 "recurring_bill_notes": {
                     "type": "string"
                 },
+                "recurring_bill_payment_due": {
+                    "type": "integer"
+                },
                 "recurring_bill_shipping_cost": {
                     "type": "number"
                 },
@@ -1137,6 +1185,45 @@ const docTemplate_swagger = `{
                     "items": {
                         "$ref": "#/definitions/entity.ListWholeSaler"
                     }
+                }
+            }
+        },
+        "entity.ListSupplierByItemDetails": {
+            "type": "object",
+            "properties": {
+                "item_description": {
+                    "type": "string"
+                },
+                "item_purchase_price": {
+                    "type": "number"
+                },
+                "item_sell_price": {
+                    "type": "number"
+                },
+                "supplier_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.ListSupplierByItemReq": {
+            "type": "object",
+            "properties": {
+                "item_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.ListSupplierByItemResp": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ListSupplierByItemDetails"
+                    }
+                },
+                "item_name": {
+                    "type": "string"
                 }
             }
         },

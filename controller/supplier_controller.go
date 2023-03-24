@@ -231,3 +231,57 @@ func (s *SupplierController) GetSupplierDetail(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(supplier)
 }
+
+// @Summary Get Supplier and Item Detail by Item Name
+// @Tags Supplier
+// @Accept  json
+// @Produce  json
+// @Param  input body entity.ListSupplierByItemReq true "list supplier by item req"
+// @Success 200 {object} entity.ListSupplierByItemResp
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /supplier/items [post]
+func (s *SupplierController) ListSupplierByItemName(c *fiber.Ctx) error {
+	functionName := "ListSupplierByItemName"
+
+	var input entity.ListSupplierByItemReq
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing item input, details = %v", err),
+		})
+	}
+
+	items, _, err := s.itemService.GetAllItemByItemName(input.ItemName)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting item, details = %v", err),
+		})
+	}
+
+	var itemDetails []entity.ListSupplierByItemDetails
+
+	if len(items) > 0 {
+		for _, item := range items {
+			supplier, _, err := s.supplierService.GetSupplier(item.SupplierID)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+					SourceFunction: functionName,
+					ErrMessage:     fmt.Sprintf("error on getting supplier by item, details = %v", err),
+				})
+			}
+			itemDetails = append(itemDetails, entity.ListSupplierByItemDetails{
+				SupplierName:  supplier.SupplierName,
+				Description:   supplier.SupplierDescription,
+				PurchasePrice: item.ItemPurchasePrice,
+				SellPrice:     item.ItemSellPrice,
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.ListSupplierByItemResp{
+		ItemName: input.ItemName,
+		Data:     itemDetails,
+	})
+}
