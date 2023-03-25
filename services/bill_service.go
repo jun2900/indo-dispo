@@ -13,8 +13,8 @@ type BillService interface {
 	GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor string) (results []model.VSupplierBill, totalRows int64, err error)
 	CreateBill(record *model.Bill) (result *model.Bill, RowsAffected int64, err error)
 	GetAllPaidAndOperasionalBillTotal() (billTotal float64)
-	GetAllMenungguPembayaranBillTotal() (billTotal float64)
-	GetAllOverdueBillTotal() (billTotal float64)
+	GetAllMenungguPembayaranBillTotalWithBillType(billType string) (billTotal float64)
+	GetAllOverdueBillTotalWithBillType(billType string) (billTotal float64)
 	GetAllOpenBillTotal() (billTotal float64)
 	UpdateBillStatus(billId int32, billStatus string) (result *model.Bill, RowsAffected int64, err error)
 	DeleteBill(billId int32) (err error)
@@ -72,14 +72,15 @@ func (r *mysqlDBRepository) CreateBill(record *model.Bill) (result *model.Bill, 
 	return record, db.RowsAffected, nil
 }
 
-func (r *mysqlDBRepository) GetAllMenungguPembayaranBillTotal() (billTotal float64) {
-	r.mysql.Model(&model.Bill{}).Where("bill_status = ?", "MENUNGGU PEMBAYARAN").Select("sum(bill_total)").Row().Scan(&billTotal)
+func (r *mysqlDBRepository) GetAllMenungguPembayaranBillTotalWithBillType(billType string) (billTotal float64) {
+	now := time.Now()
+	r.mysql.Model(&model.Bill{}).Where("bill_status = ? AND bill_type = ? AND bill_due_date >= ?", "MENUNGGU PEMBAYARAN", billType, now).Select("sum(bill_total)").Row().Scan(&billTotal)
 	return billTotal
 }
 
-func (r *mysqlDBRepository) GetAllOverdueBillTotal() (billTotal float64) {
+func (r *mysqlDBRepository) GetAllOverdueBillTotalWithBillType(billType string) (billTotal float64) {
 	now := time.Now()
-	r.mysql.Model(&model.Bill{}).Where("bill_due_date <= ?", now).Not("bill_status IN ?", []string{"SUDAH DIBAYAR", "MENUNGGU PEMBAYARAN", "CANCELLED"}).Select("sum(bill_total)").Row().Scan(&billTotal)
+	r.mysql.Model(&model.Bill{}).Where("bill_due_date < ? AND bill_type = ?", now, billType).Not("bill_status IN ?", []string{"SUDAH DIBAYAR", "CANCELLED"}).Select("sum(bill_total)").Row().Scan(&billTotal)
 	return billTotal
 }
 

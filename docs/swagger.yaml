@@ -578,7 +578,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/entity.BillHeaderResp'
-      summary: Get Bill Header
+      summary: Get Bill Header For Raw Only
       tags:
       - Bill
   /bills:

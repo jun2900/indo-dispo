@@ -193,7 +193,7 @@ const docTemplate_swagger = `{
                 "tags": [
                     "Bill"
                 ],
-                "summary": "Get Bill Header",
+                "summary": "Get Bill Header For Raw Only",
                 "responses": {
                     "200": {
                         "description": "OK",

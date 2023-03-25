@@ -356,7 +356,7 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 	})
 }
 
-// @Summary Get Bill Header
+// @Summary Get Bill Header For Raw Only
 // @Description get bill overdue open and draft stats
 // @Tags Bill
 // @Accept  json
@@ -365,9 +365,9 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 // @Router /bill/header [get]
 func (b *BillController) GetBillHeader(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(entity.BillHeaderResp{
-		Overdue:   b.billService.GetAllOverdueBillTotal(),
+		Overdue:   b.billService.GetAllOverdueBillTotalWithBillType("raw"),
 		Open:      b.billService.GetAllOpenBillTotal(),
-		BillDraft: b.billService.GetAllMenungguPembayaranBillTotal(),
+		BillDraft: b.billService.GetAllMenungguPembayaranBillTotalWithBillType("raw"),
 	})
 }
 
