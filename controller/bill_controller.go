@@ -42,6 +42,7 @@ func NewBillController(supplierService services.SupplierService, billService ser
 // @Param       order    				query    string false "asc / desc"
 // @Param status query string false "filter by bill status"
 // @Param vendor query string false "filter by supplier name"
+// @Param billType query string false "filter by bill type"
 // @Success 200 {object} entity.PagedResults{Data=[]model.VSupplierBill}
 // @Failure 400 {object} entity.ErrRespController
 // @Failure 500 {object} entity.ErrRespController
@@ -51,12 +52,13 @@ func (b *BillController) GetAllBills(c *fiber.Ctx) error {
 
 	status := c.Query("status", "")
 	vendor := c.Query("vendor", "")
-	order := c.Query("order", "")
+	billType := c.Query("billType", "")
 
+	order := c.Query("order", "")
 	page := c.QueryInt("page", 0)
 	pagesize := c.QueryInt("pagesize", 20)
 
-	bills, totalRows, err := b.billService.GetAllBill(page, pagesize, order, time.Time{}, status, vendor)
+	bills, totalRows, err := b.billService.GetAllBill(page, pagesize, order, time.Time{}, status, vendor, billType)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,

@@ -381,6 +381,12 @@ const docTemplate_swagger = `{
                         "description": "filter by supplier name",
                         "name": "vendor",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter by bill type",
+                        "name": "billType",
+                        "in": "query"
                     }
                 ],
                 "responses": {

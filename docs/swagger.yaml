@@ -606,6 +606,10 @@ paths:
         in: query
         name: vendor
         type: string
+      - description: filter by bill type
+        in: query
+        name: billType
+        type: string
       produces:
       - application/json
       responses:

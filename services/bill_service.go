@@ -10,7 +10,7 @@ import (
 
 type BillService interface {
 	GetBill(billId int32) (result *model.Bill, RowsAffected int64, err error)
-	GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor string) (results []model.VSupplierBill, totalRows int64, err error)
+	GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor, billType string) (results []model.VSupplierBill, totalRows int64, err error)
 	CreateBill(record *model.Bill) (result *model.Bill, RowsAffected int64, err error)
 	GetAllPaidAndOperasionalBillTotal() (billTotal float64)
 	GetAllMenungguPembayaranBillTotalWithBillType(billType string) (billTotal float64)
@@ -34,13 +34,16 @@ func (r *mysqlDBRepository) GetBill(billId int32) (result *model.Bill, RowsAffec
 	return result, db.RowsAffected, nil
 }
 
-func (r *mysqlDBRepository) GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor string) (results []model.VSupplierBill, totalRows int64, err error) {
+func (r *mysqlDBRepository) GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor, billType string) (results []model.VSupplierBill, totalRows int64, err error) {
 	resultOrm := r.mysql.Model(&model.VSupplierBill{})
 	if len(status) > 0 {
 		resultOrm = resultOrm.Where("bill_status = ?", status)
 	}
 	if len(vendor) > 0 {
 		resultOrm = resultOrm.Where("supplier_name LIKE ?", fmt.Sprint("%", vendor, "%"))
+	}
+	if len(billType) > 0 {
+		resultOrm = resultOrm.Where("bill_type = ?", billType)
 	}
 
 	resultOrm.Count(&totalRows)
