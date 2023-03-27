@@ -96,6 +96,7 @@ func main() {
 
 	app.Get("/balance/header", balanceController.GetNetBalanceAmount)
 	app.Put("/balance", balanceController.AddBalanceAmount)
+	app.Get("/balance/logs", balanceController.GetAllBalanceLog)
 
 	app.Post("/recurring_bill", recurringBillController.AddRecurringBill)
 

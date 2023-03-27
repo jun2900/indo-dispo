@@ -50,6 +50,68 @@ func (b *BalanceController) GetNetBalanceAmount(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Get All Balance Logs
+// @Tags Balance
+// @Accept  json
+// @Produce  json
+// @Param       page     				query    int    false "page requested (defaults to 0)"
+// @Param       pagesize 				query    int    false "number of records in a page  (defaults to 20)"
+// @Param       order    				query    string false "asc / desc"
+// @Param       log_start_time    	query    string false "balance log time start (lower bound)"
+// @Param       log_end_time    	query    string false "balance log time end (upper bound)"
+// @Success 200 {object} entity.PagedResults{Data=[]model.BalanceLog}
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /balance/logs [get]
+func (b *BalanceController) GetAllBalanceLog(c *fiber.Ctx) error {
+	functionName := "GetAllBalanceLog"
+
+	page := c.QueryInt("page", 0)
+	pagesize := c.QueryInt("pagesize", 20)
+
+	order := c.Query("order", "")
+	log_start_time := c.Query("log_start_time", "")
+	log_end_time := c.Query("log_end_time", "")
+
+	var b_log_start_time time.Time
+	var b_log_end_time time.Time
+
+	var err error
+	if log_start_time != "" {
+		b_log_start_time, err = time.Parse(layoutTime, log_start_time)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on parsing time, details = %v", err),
+			})
+		}
+	}
+	if log_end_time != "" {
+		b_log_end_time, err = time.Parse(layoutTime, log_end_time)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on parsing time, details = %v", err),
+			})
+		}
+	}
+
+	balanceLogs, totalRows, err := b.balanceLogService.GetAllBalanceLog(page, pagesize, order, b_log_start_time, b_log_end_time)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting balance logs, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.PagedResults{
+		Page:         page,
+		PageSize:     pagesize,
+		Data:         balanceLogs,
+		TotalRecords: int(totalRows),
+	})
+}
+
 // @Summary Add Balance Amount
 // @Tags Balance
 // @Accept  json

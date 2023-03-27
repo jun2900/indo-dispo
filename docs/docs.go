@@ -136,6 +136,87 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/balance/logs": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Balance"
+                ],
+                "summary": "Get All Balance Logs",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page requested (defaults to 0)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "number of records in a page  (defaults to 20)",
+                        "name": "pagesize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "asc / desc",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "balance log time start (lower bound)",
+                        "name": "log_start_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "balance log time end (upper bound)",
+                        "name": "log_end_time",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/entity.PagedResults"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.BalanceLog"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/bill": {
             "post": {
                 "consumes": [
@@ -1391,6 +1472,29 @@ const docTemplate_swagger = `{
                 },
                 "wholesaler_qty": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.BalanceLog": {
+            "type": "object",
+            "properties": {
+                "balance_log_amount": {
+                    "type": "number"
+                },
+                "balance_log_attachment": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "balance_log_id": {
+                    "type": "integer"
+                },
+                "balance_log_notes": {
+                    "type": "string"
+                },
+                "balance_log_time_added": {
+                    "type": "string"
                 }
             }
         },

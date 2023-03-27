@@ -311,6 +311,21 @@ definitions:
       wholesaler_qty:
         type: integer
     type: object
+  model.BalanceLog:
+    properties:
+      balance_log_amount:
+        type: number
+      balance_log_attachment:
+        items:
+          type: integer
+        type: array
+      balance_log_id:
+        type: integer
+      balance_log_notes:
+        type: string
+      balance_log_time_added:
+        type: string
+    type: object
   model.Supplier:
     properties:
       supplier_address:
@@ -446,6 +461,56 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Get Balance Header
+      tags:
+      - Balance
+  /balance/logs:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: page requested (defaults to 0)
+        in: query
+        name: page
+        type: integer
+      - description: number of records in a page  (defaults to 20)
+        in: query
+        name: pagesize
+        type: integer
+      - description: asc / desc
+        in: query
+        name: order
+        type: string
+      - description: balance log time start (lower bound)
+        in: query
+        name: log_start_time
+        type: string
+      - description: balance log time end (upper bound)
+        in: query
+        name: log_end_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/entity.PagedResults'
+            - properties:
+                Data:
+                  items:
+                    $ref: '#/definitions/model.BalanceLog'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Get All Balance Logs
       tags:
       - Balance
   /bill:
