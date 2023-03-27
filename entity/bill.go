@@ -1,17 +1,28 @@
 package entity
 
 type AddBillReq struct {
-	SupplierId      int32          `json:"supplier_id"`
-	StartDate       string         `json:"bill_start_date"`
-	DueDate         string         `json:"bill_due_date"`
-	BillOrderNumber *string        `json:"bill_order_number"`
-	BillType        string         `json:"bill_type"`
-	Attachments     []Attachment   `json:"bill_attachments"`
-	Items           []ItemPurchase `json:"bill_items"`
-	BankName        string         `json:"bill_bank_name"`
-	AccountNumber   string         `json:"bill_account_number"`
-	ShippingCost    float64        `json:"bill_shipping_cost"`
-	BillNote        *string        `json:"bill_notes"`
+	SupplierId    int32          `json:"supplier_id"`
+	StartDate     string         `json:"bill_start_date"`
+	DueDate       string         `json:"bill_due_date"`
+	BillType      string         `json:"bill_type"`
+	Attachments   []Attachment   `json:"bill_attachments"`
+	Items         []ItemPurchase `json:"bill_items"`
+	BankName      string         `json:"bill_bank_name"`
+	AccountNumber string         `json:"bill_account_number"`
+	ShippingCost  float64        `json:"bill_shipping_cost"`
+	BillNote      *string        `json:"bill_notes"`
+}
+
+type UpdateBillReq struct {
+	SupplierId    int32          `json:"supplier_id"`
+	StartDate     string         `json:"bill_start_date"`
+	DueDate       string         `json:"bill_due_date"`
+	Attachments   []Attachment   `json:"bill_attachments"`
+	Items         []ItemPurchase `json:"bill_items"`
+	BankName      string         `json:"bill_bank_name"`
+	AccountNumber string         `json:"bill_account_number"`
+	ShippingCost  float64        `json:"bill_shipping_cost"`
+	BillNote      *string        `json:"bill_notes"`
 }
 
 type ItemPurchase struct {

@@ -90,8 +90,9 @@ func main() {
 
 	app.Get("/bills", billController.GetAllBills)
 	app.Get("/bill/header", billController.GetBillHeader)
+	app.Put("/bill/status/:billId", billController.UpdateBillStatus)
+	app.Put("/bill/:billId", billController.UpdateBill)
 	app.Get("/bill/:billId", billController.GetBillDetail)
-	app.Put("/bill/:billId", billController.UpdateBillStatus)
 	app.Delete("/bill/:billId", billController.DeleteBill)
 
 	app.Get("/balance/header", balanceController.GetNetBalanceAmount)

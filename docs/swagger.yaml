@@ -17,8 +17,6 @@ definitions:
         type: array
       bill_notes:
         type: string
-      bill_order_number:
-        type: string
       bill_shipping_cost:
         type: number
       bill_start_date:
@@ -286,6 +284,31 @@ definitions:
         type: string
       balance_notes:
         type: string
+    type: object
+  entity.UpdateBillReq:
+    properties:
+      bill_account_number:
+        type: string
+      bill_attachments:
+        items:
+          $ref: '#/definitions/entity.Attachment'
+        type: array
+      bill_bank_name:
+        type: string
+      bill_due_date:
+        type: string
+      bill_items:
+        items:
+          $ref: '#/definitions/entity.ItemPurchase'
+        type: array
+      bill_notes:
+        type: string
+      bill_shipping_cost:
+        type: number
+      bill_start_date:
+        type: string
+      supplier_id:
+        type: integer
     type: object
   entity.UpdateItemReq:
     properties:
@@ -601,6 +624,56 @@ paths:
     put:
       consumes:
       - application/json
+      description: Update Bill more detail but not status
+      parameters:
+      - description: bill id
+        in: path
+        name: billId
+        required: true
+        type: integer
+      - description: update bill req
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateBillReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Update Bill
+      tags:
+      - Bill
+  /bill/header:
+    get:
+      consumes:
+      - application/json
+      description: get bill overdue open and draft stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.BillHeaderResp'
+      summary: Get Bill Header For Raw Only
+      tags:
+      - Bill
+  /bill/status/{billId}:
+    put:
+      consumes:
+      - application/json
       parameters:
       - description: bill id
         in: path
@@ -629,21 +702,6 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Update Bill Status
-      tags:
-      - Bill
-  /bill/header:
-    get:
-      consumes:
-      - application/json
-      description: get bill overdue open and draft stats
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/entity.BillHeaderResp'
-      summary: Get Bill Header For Raw Only
       tags:
       - Bill
   /bills:

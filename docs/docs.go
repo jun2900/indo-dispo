@@ -285,6 +285,58 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/bill/status/{billId}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Update Bill Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "bill id",
+                        "name": "billId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "update bill status request (paid/cancelled)",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.BillUpdateStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/bill/{billId}": {
             "get": {
                 "consumes": [
@@ -328,6 +380,7 @@ const docTemplate_swagger = `{
                 }
             },
             "put": {
+                "description": "Update Bill more detail but not status",
                 "consumes": [
                     "application/json"
                 ],
@@ -337,7 +390,7 @@ const docTemplate_swagger = `{
                 "tags": [
                     "Bill"
                 ],
-                "summary": "Update Bill Status",
+                "summary": "Update Bill",
                 "parameters": [
                     {
                         "type": "integer",
@@ -347,12 +400,12 @@ const docTemplate_swagger = `{
                         "required": true
                     },
                     {
-                        "description": "update bill status request (paid/cancelled)",
+                        "description": "update bill req",
                         "name": "input",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/entity.BillUpdateStatusReq"
+                            "$ref": "#/definitions/entity.UpdateBillReq"
                         }
                     }
                 ],
@@ -1023,9 +1076,6 @@ const docTemplate_swagger = `{
                 "bill_notes": {
                     "type": "string"
                 },
-                "bill_order_number": {
-                    "type": "string"
-                },
                 "bill_shipping_cost": {
                     "type": "number"
                 },
@@ -1435,6 +1485,44 @@ const docTemplate_swagger = `{
                 },
                 "balance_notes": {
                     "type": "string"
+                }
+            }
+        },
+        "entity.UpdateBillReq": {
+            "type": "object",
+            "properties": {
+                "bill_account_number": {
+                    "type": "string"
+                },
+                "bill_attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Attachment"
+                    }
+                },
+                "bill_bank_name": {
+                    "type": "string"
+                },
+                "bill_due_date": {
+                    "type": "string"
+                },
+                "bill_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ItemPurchase"
+                    }
+                },
+                "bill_notes": {
+                    "type": "string"
+                },
+                "bill_shipping_cost": {
+                    "type": "number"
+                },
+                "bill_start_date": {
+                    "type": "string"
+                },
+                "supplier_id": {
+                    "type": "integer"
                 }
             }
         },

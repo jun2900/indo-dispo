@@ -17,6 +17,7 @@ type BillService interface {
 	GetAllOverdueBillTotalWithBillType(billType string) (billTotal float64)
 	GetAllOpenBillTotal() (billTotal float64)
 	UpdateBillStatus(billId int32, billStatus string) (result *model.Bill, RowsAffected int64, err error)
+	UpdateBill(itemId int32, updated *model.Bill) (result *model.Bill, RowsAffected int64, err error)
 	DeleteBill(billId int32) (err error)
 }
 
@@ -119,4 +120,23 @@ func (r *mysqlDBRepository) DeleteBill(billId int32) (err error) {
 		return err
 	}
 	return nil
+}
+
+func (r *mysqlDBRepository) UpdateBill(itemId int32, updated *model.Bill) (result *model.Bill, RowsAffected int64, err error) {
+	result = &model.Bill{}
+	db := r.mysql.First(result, itemId)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrNotFound
+	}
+
+	if err = Copy(result, updated); err != nil {
+		return nil, -1, ErrUpdateFailed
+	}
+
+	db = db.Save(result)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrUpdateFailed
+	}
+
+	return result, db.RowsAffected, nil
 }

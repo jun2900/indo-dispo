@@ -5,6 +5,7 @@ import (
 	"anara/model"
 	"anara/services"
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"math/big"
 	"strings"
@@ -95,85 +96,26 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		})
 	}
 
-	startDateTime, err := time.Parse(layoutTime, input.StartDate)
+	startDateTime, dueDateTime, total, err := b.validateBillData(struct {
+		StartDate     string
+		DueDate       string
+		Items         []entity.ItemPurchase
+		BankName      string
+		AccountNumber string
+		SupplierId    int32
+	}{
+		StartDate:     input.StartDate,
+		DueDate:       input.DueDate,
+		Items:         input.Items,
+		BankName:      input.BankName,
+		AccountNumber: input.AccountNumber,
+		SupplierId:    input.SupplierId,
+	})
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on parsing start date, details = %v", err),
+			ErrMessage:     err.Error(),
 		})
-	}
-
-	dueDateTime, err := time.Parse(layoutTime, input.DueDate)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on parsing due date, details = %v", err),
-		})
-	}
-
-	if len(input.Items) < 1 {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "items cannot be empty",
-		})
-	}
-
-	if !strings.EqualFold(input.BillType, "raw") && !strings.EqualFold(input.BillType, "operasional") {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "bill type must be `raw` or `operasional`",
-		})
-	}
-
-	if len(input.BankName) < 1 {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "bank name cannot be empty",
-		})
-	}
-
-	if len(input.AccountNumber) < 1 {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "account number cannot be empty",
-		})
-	}
-
-	//if input.Discount != nil {
-	//	if int(*input.Discount) < 0 && int(*input.Discount) > 100 {
-	//		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-	//			SourceFunction: functionName,
-	//			ErrMessage:     "discount cannot be below 0 or pass 100",
-	//		})
-	//	}
-	//}
-
-	supplier, _, err := b.supplierService.GetSupplier(input.SupplierId)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on getting supplier details = %v", err),
-		})
-	}
-
-	if strings.ToLower(supplier.SupplierType) != "vendor" {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "supplier is not a vendor",
-		})
-	}
-
-	var total float64
-	total = 0
-	for _, item := range input.Items {
-		it, err := b.itemService.GetItemWithItemIdAndSupplierId(item.ItemId, input.SupplierId)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-				SourceFunction: functionName,
-				ErrMessage:     fmt.Sprintf("error on getting item with item id '%d' and supplier id  '%d' details = %v", item.ItemId, input.SupplierId, err),
-			})
-		}
-		total += it.ItemPurchasePrice*float64(item.ItemQty) - it.ItemPurchasePrice*float64(item.ItemQty)**item.ItemDiscount/100
 	}
 
 	randNum, _ := rand.Int(rand.Reader, big.NewInt(9000))
@@ -382,7 +324,7 @@ func (b *BillController) GetBillHeader(c *fiber.Ctx) error {
 // @Success 200 {object} entity.StatusResponse
 // @Failure 400 {object} entity.ErrRespController
 // @Failure 500 {object} entity.ErrRespController
-// @Router /bill/{billId} [put]
+// @Router /bill/status/{billId} [put]
 func (b *BillController) UpdateBillStatus(c *fiber.Ctx) error {
 	var input entity.BillUpdateStatusReq
 
@@ -433,6 +375,130 @@ func (b *BillController) UpdateBillStatus(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Update Bill
+// @Description Update Bill more detail but not status
+// @Tags Bill
+// @Accept  json
+// @Produce  json
+// @Param  billId path int true "bill id"
+// @Param  input body entity.UpdateBillReq true "update bill req"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /bill/{billId} [put]
+func (b *BillController) UpdateBill(c *fiber.Ctx) error {
+	functionName := "UpdateBill"
+
+	var input entity.UpdateBillReq
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing item input, details = %v", err),
+		})
+	}
+
+	billId, err := c.ParamsInt("billId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing bill id, details = %v", err),
+		})
+	}
+
+	bill, err := b.deleteRelatedBillThings(int32(billId))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     err.Error(),
+		})
+	}
+
+	startDateTime, dueDateTime, total, err := b.validateBillData(struct {
+		StartDate     string
+		DueDate       string
+		Items         []entity.ItemPurchase
+		BankName      string
+		AccountNumber string
+		SupplierId    int32
+	}{
+		StartDate:     input.StartDate,
+		DueDate:       input.DueDate,
+		Items:         input.Items,
+		BankName:      input.BankName,
+		AccountNumber: input.AccountNumber,
+		SupplierId:    input.SupplierId,
+	})
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     err.Error(),
+		})
+	}
+
+	_, _, err = b.billService.UpdateBill(bill.BillID, &model.Bill{
+		SupplierID:        input.SupplierId,
+		BillStartDate:     startDateTime,
+		BillDueDate:       dueDateTime,
+		BillTotal:         total,
+		BillShippingCost:  input.ShippingCost,
+		BillAccountNumber: input.AccountNumber,
+		BillBankName:      input.BankName,
+		BillNotes:         input.BillNote,
+	})
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on creating bill, details = %v", err),
+		})
+	}
+
+	var modelAttachments []model.Attachment
+
+	if len(input.Attachments) > 0 {
+		for _, at := range input.Attachments {
+			modelAttachments = append(modelAttachments, model.Attachment{
+				BillID:         &bill.BillID,
+				InvoiceID:      nil,
+				AttachmentName: at.Name,
+				AttachmentFile: at.File,
+			})
+		}
+
+		_, _, err = b.attachmentService.CreateAttachments(modelAttachments)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on creating attachments, details = %v", err),
+			})
+		}
+	}
+
+	var modelItemPurchases []model.ItemPurchase
+	for _, item := range input.Items {
+		modelItemPurchases = append(modelItemPurchases, model.ItemPurchase{
+			ItemID:               item.ItemId,
+			BillID:               &bill.BillID,
+			RecurringBillID:      nil,
+			ItemPurchaseQty:      item.ItemQty,
+			ItemPurchaseTime:     time.Now(),
+			ItemPurchaseDiscount: item.ItemDiscount,
+		})
+	}
+	_, _, err = b.itemPurchaseService.CreateItemPurchase(modelItemPurchases)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on creating item purchases, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{
+		Status: "successfully updated bill",
+	})
+
+}
+
 // @Summary Delete Bill
 // @Description delete bill that are not paid yet
 // @Tags Bill
@@ -454,32 +520,11 @@ func (b *BillController) DeleteBill(c *fiber.Ctx) error {
 		})
 	}
 
-	bill, _, err := b.billService.GetBill(int32(billId))
+	bill, err := b.deleteRelatedBillThings(int32(billId))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on getting bill, details = %v", err),
-		})
-	}
-
-	if strings.ToLower(bill.BillStatus) == "sudah dibayar" {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "bill already been paid",
-		})
-	}
-
-	if err := b.itemPurchaseService.DeleteItemPurchasesByBillId(bill.BillID); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on deleting item purchases by bill id, details = %v", err),
-		})
-	}
-
-	if err := b.attachmentService.DeleteAttachmentByBillId(bill.BillID); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on deleting item purchases by bill id, details = %v", err),
+			ErrMessage:     err.Error(),
 		})
 	}
 
@@ -493,4 +538,76 @@ func (b *BillController) DeleteBill(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
 		Status: "success on deleting bill",
 	})
+}
+
+func (b *BillController) deleteRelatedBillThings(billId int32) (bill *model.Bill, err error) {
+	bill, _, err = b.billService.GetBill(int32(billId))
+	if err != nil {
+		return nil, fmt.Errorf("error on getting bill, details = %v", err)
+	}
+
+	if strings.ToLower(bill.BillStatus) == "sudah dibayar" {
+		return nil, errors.New("bill already been paid")
+	}
+
+	if err := b.itemPurchaseService.DeleteItemPurchasesByBillId(bill.BillID); err != nil {
+		return nil, fmt.Errorf("error on deleting item purchases by bill id, details = %v", err)
+	}
+
+	if err := b.attachmentService.DeleteAttachmentByBillId(bill.BillID); err != nil {
+		return nil, fmt.Errorf("error on deleting item purchases by bill id, details = %v", err)
+	}
+
+	return bill, nil
+}
+
+func (b *BillController) validateBillData(input struct {
+	StartDate     string
+	DueDate       string
+	Items         []entity.ItemPurchase
+	BankName      string
+	AccountNumber string
+	SupplierId    int32
+}) (startDateTime time.Time, dueDateTime time.Time, total float64, err error) {
+	startDateTime, err = time.Parse(layoutTime, input.StartDate)
+	if err != nil {
+		return time.Time{}, time.Time{}, -1, fmt.Errorf("error on parsing start date, details = %v", err)
+	}
+
+	dueDateTime, err = time.Parse(layoutTime, input.DueDate)
+	if err != nil {
+		return time.Time{}, time.Time{}, -1, fmt.Errorf("error on parsing due date, details = %v", err)
+	}
+
+	if len(input.Items) < 1 {
+		return time.Time{}, time.Time{}, -1, errors.New("items cannot be empty")
+	}
+
+	if len(input.BankName) < 1 {
+		return time.Time{}, time.Time{}, -1, errors.New("bank name cannot be empty")
+	}
+
+	if len(input.AccountNumber) < 1 {
+		return time.Time{}, time.Time{}, -1, errors.New("account number cannot be empty")
+	}
+
+	supplier, _, err := b.supplierService.GetSupplier(input.SupplierId)
+	if err != nil {
+		return time.Time{}, time.Time{}, -1, fmt.Errorf("error on getting supplier details = %v", err)
+	}
+
+	if strings.ToLower(supplier.SupplierType) != "vendor" {
+		return time.Time{}, time.Time{}, -1, errors.New("supplier is not a vendor")
+	}
+
+	total = 0
+	for _, item := range input.Items {
+		it, err := b.itemService.GetItemWithItemIdAndSupplierId(item.ItemId, input.SupplierId)
+		if err != nil {
+			return time.Time{}, time.Time{}, -1, fmt.Errorf("error on getting item with item id '%d' and supplier id  '%d' details = %v", item.ItemId, input.SupplierId, err)
+		}
+		total += it.ItemPurchasePrice*float64(item.ItemQty) - it.ItemPurchasePrice*float64(item.ItemQty)**item.ItemDiscount/100
+	}
+
+	return startDateTime, dueDateTime, total, nil
 }
