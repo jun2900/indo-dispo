@@ -212,6 +212,40 @@ func (r *RecurringBillController) AddRecurringBill(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary List All Recurring Bills
+// @Tags Recurring Bill
+// @Accept  json
+// @Produce  json
+// @Param       page     				query    int    false "page requested (defaults to 0)"
+// @Param       pagesize 				query    int    false "number of records in a page  (defaults to 20)"
+// @Param       order    				query    string false "asc / desc"
+// @Success 200 {object} entity.PagedResults{Data=[]model.RecurringBill}
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /recurring_bills [get]
+func (r *RecurringBillController) GetAllRecurringBill(c *fiber.Ctx) error {
+	functionName := "GetAllRecurringBill"
+
+	page := c.QueryInt("page", 0)
+	pagesize := c.QueryInt("pagesize", 20)
+	order := c.Query("order", "")
+
+	recurBills, totalRecords, err := r.recurringBillService.GetAllRecurringBill(page, pagesize, order)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting recur bills, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.PagedResults{
+		Page:         page,
+		PageSize:     pagesize,
+		Data:         recurBills,
+		TotalRecords: int(totalRecords),
+	})
+}
+
 func stringInSlice(s string, slice []string) bool {
 	for _, str := range slice {
 		if strings.EqualFold(str, s) {

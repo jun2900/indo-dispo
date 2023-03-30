@@ -349,6 +349,31 @@ definitions:
       balance_log_time_added:
         type: string
     type: object
+  model.RecurringBill:
+    properties:
+      account_number:
+        type: string
+      bank_name:
+        type: string
+      end_date:
+        type: string
+      frequency:
+        type: string
+      id:
+        type: integer
+      notes:
+        type: string
+      payment_due:
+        type: integer
+      shipping_cost:
+        type: number
+      start_date:
+        type: string
+      supplier_id:
+        type: integer
+      total:
+        type: number
+    type: object
   model.Supplier:
     properties:
       supplier_address:
@@ -912,6 +937,48 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Register Recurring Bill
+      tags:
+      - Recurring Bill
+  /recurring_bills:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: page requested (defaults to 0)
+        in: query
+        name: page
+        type: integer
+      - description: number of records in a page  (defaults to 20)
+        in: query
+        name: pagesize
+        type: integer
+      - description: asc / desc
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/entity.PagedResults'
+            - properties:
+                Data:
+                  items:
+                    $ref: '#/definitions/model.RecurringBill'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: List All Recurring Bills
       tags:
       - Recurring Bill
   /supplier:
