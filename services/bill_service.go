@@ -10,7 +10,7 @@ import (
 
 type BillService interface {
 	GetBill(billId int32) (result *model.Bill, RowsAffected int64, err error)
-	GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor, billType string) (results []model.VSupplierBill, totalRows int64, err error)
+	GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor, billType string, dateFrom, dateTo time.Time) (results []model.VSupplierBill, totalRows int64, err error)
 	CreateBill(record *model.Bill) (result *model.Bill, RowsAffected int64, err error)
 	GetAllPaidAndOperasionalBillTotal() (billTotal float64)
 	GetAllMenungguPembayaranBillTotalWithBillType(billType string) (billTotal float64)
@@ -35,7 +35,7 @@ func (r *mysqlDBRepository) GetBill(billId int32) (result *model.Bill, RowsAffec
 	return result, db.RowsAffected, nil
 }
 
-func (r *mysqlDBRepository) GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor, billType string) (results []model.VSupplierBill, totalRows int64, err error) {
+func (r *mysqlDBRepository) GetAllBill(page, pagesize int, order string, dueDate time.Time, status string, vendor, billType string, dateFrom, dateTo time.Time) (results []model.VSupplierBill, totalRows int64, err error) {
 	resultOrm := r.mysql.Model(&model.VSupplierBill{})
 	if len(status) > 0 {
 		resultOrm = resultOrm.Where("bill_status = ?", status)
@@ -45,6 +45,14 @@ func (r *mysqlDBRepository) GetAllBill(page, pagesize int, order string, dueDate
 	}
 	if len(billType) > 0 {
 		resultOrm = resultOrm.Where("bill_type = ?", billType)
+	}
+
+	if !dateFrom.IsZero() && !dateTo.IsZero() {
+		resultOrm = resultOrm.Where("bill_start_date >= (? - INTERVAL 1 DAY) AND bill_start_date < (? + INTERVAL 1 DAY)", dateFrom, dateTo)
+	} else if !dateFrom.IsZero() && dateTo.IsZero() {
+		resultOrm = resultOrm.Where("bill_start_date >= (? - INTERVAL 1 DAY)", dateFrom)
+	} else if dateFrom.IsZero() && !dateTo.IsZero() {
+		resultOrm = resultOrm.Where("bill_start_date < (? + INTERVAL 1 DAY)", dateTo)
 	}
 
 	resultOrm.Count(&totalRows)

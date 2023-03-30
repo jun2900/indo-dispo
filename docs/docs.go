@@ -521,6 +521,18 @@ const docTemplate_swagger = `{
                         "description": "filter by bill type",
                         "name": "billType",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "search lower limit event time",
+                        "name": "dateFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "search upper limit event time",
+                        "name": "dateTo",
+                        "in": "query"
                     }
                 ],
                 "responses": {

@@ -733,6 +733,14 @@ paths:
         in: query
         name: billType
         type: string
+      - description: search lower limit event time
+        in: query
+        name: dateFrom
+        type: string
+      - description: search upper limit event time
+        in: query
+        name: dateTo
+        type: string
       produces:
       - application/json
       responses:

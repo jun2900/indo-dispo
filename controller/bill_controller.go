@@ -44,6 +44,8 @@ func NewBillController(supplierService services.SupplierService, billService ser
 // @Param status query string false "filter by bill status"
 // @Param vendor query string false "filter by supplier name"
 // @Param billType query string false "filter by bill type"
+// @Param   dateFrom    query    string  false        "search lower limit event time"
+// @Param   dateTo    query    string  false        "search upper limit event time"
 // @Success 200 {object} entity.PagedResults{Data=[]model.VSupplierBill}
 // @Failure 400 {object} entity.ErrRespController
 // @Failure 500 {object} entity.ErrRespController
@@ -59,7 +61,34 @@ func (b *BillController) GetAllBills(c *fiber.Ctx) error {
 	page := c.QueryInt("page", 0)
 	pagesize := c.QueryInt("pagesize", 20)
 
-	bills, totalRows, err := b.billService.GetAllBill(page, pagesize, order, time.Time{}, status, vendor, billType)
+	dateFrom := c.Query("dateFrom", "")
+	dateTo := c.Query("dateTo", "")
+
+	var dateFromTime time.Time
+	var dateToTime time.Time
+	var err error
+
+	if dateFrom != "" {
+		dateFromTime, err = time.Parse(layoutTime, dateFrom)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on parsing date from time, details = %v", err),
+			})
+		}
+	}
+
+	if dateTo != "" {
+		dateToTime, err = time.Parse(layoutTime, dateTo)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on parsing date to time, details = %v", err),
+			})
+		}
+	}
+
+	bills, totalRows, err := b.billService.GetAllBill(page, pagesize, order, time.Time{}, status, vendor, billType, dateFromTime, dateToTime)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
