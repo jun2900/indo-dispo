@@ -9,6 +9,7 @@ import (
 type RecurringBillService interface {
 	GetAllRecurringBill(page, pagesize int, order string) (results []model.RecurringBill, TotalRows int64, err error)
 	CreateRecurringBill(record *model.RecurringBill) (results *model.RecurringBill, RowsAffected int64, err error)
+	UpdateRecurringBill(recurringBillId int32, updated *model.RecurringBill) (result *model.RecurringBill, RowsAffected int64, err error)
 }
 
 func NewRecurringBillService(mysqlConnection *gorm.DB) RecurringBillService {
@@ -47,4 +48,23 @@ func (r *mysqlDBRepository) CreateRecurringBill(record *model.RecurringBill) (re
 	}
 
 	return record, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) UpdateRecurringBill(recurringBillId int32, updated *model.RecurringBill) (result *model.RecurringBill, RowsAffected int64, err error) {
+	result = &model.RecurringBill{}
+	db := r.mysql.First(result, recurringBillId)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrNotFound
+	}
+
+	if err = Copy(result, updated); err != nil {
+		return nil, -1, ErrUpdateFailed
+	}
+
+	db = db.Save(result)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrUpdateFailed
+	}
+
+	return result, db.RowsAffected, nil
 }

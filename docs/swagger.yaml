@@ -285,6 +285,11 @@ definitions:
       balance_notes:
         type: string
     type: object
+  entity.UpdateBillRecurringStatus:
+    properties:
+      recurring_bill_status:
+        type: string
+    type: object
   entity.UpdateBillReq:
     properties:
       bill_account_number:
@@ -368,6 +373,8 @@ definitions:
       shipping_cost:
         type: number
       start_date:
+        type: string
+      status:
         type: string
       supplier_id:
         type: integer
@@ -937,6 +944,40 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Register Recurring Bill
+      tags:
+      - Recurring Bill
+  /recurring_bill/status/{recurringBillId}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: recurring bill id
+        in: path
+        name: recurringBillId
+        required: true
+        type: integer
+      - description: update bill status request (active/inactive)
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateBillRecurringStatus'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Update Recurring Bill Status
       tags:
       - Recurring Bill
   /recurring_bills:

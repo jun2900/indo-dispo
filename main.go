@@ -52,7 +52,7 @@ func main() {
 	readEnvironmentFile()
 
 	DB := infrastructure.OpenDbConnection()
-	go scheduleDailyTask(0, 0, 0, func() {
+	go scheduleDailyTask(22, 27, 0, func() {
 		scriptCheckRecurring(DB)
 	})
 
@@ -111,6 +111,7 @@ func main() {
 
 	app.Get("/recurring_bills", recurringBillController.GetAllRecurringBill)
 	app.Post("/recurring_bill", recurringBillController.AddRecurringBill)
+	app.Put("recurring_bill/status/:recurringBillId", recurringBillController.UpdateStatusRecurringBill)
 
 	app.Post("/admin/login", adminController.Login)
 

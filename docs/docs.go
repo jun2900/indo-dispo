@@ -799,6 +799,58 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/recurring_bill/status/{recurringBillId}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Recurring Bill"
+                ],
+                "summary": "Update Recurring Bill Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "recurring bill id",
+                        "name": "recurringBillId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "update bill status request (active/inactive)",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateBillRecurringStatus"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/recurring_bills": {
             "get": {
                 "consumes": [
@@ -1569,6 +1621,14 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "entity.UpdateBillRecurringStatus": {
+            "type": "object",
+            "properties": {
+                "recurring_bill_status": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.UpdateBillReq": {
             "type": "object",
             "properties": {
@@ -1695,6 +1755,9 @@ const docTemplate_swagger = `{
                     "type": "number"
                 },
                 "start_date": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 },
                 "supplier_id": {

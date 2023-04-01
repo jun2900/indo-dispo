@@ -15,6 +15,9 @@ var (
 	enumFrequency = []string{
 		"daily", "weekly", "monthly",
 	}
+	enumStatus = []string{
+		"active", "inactive",
+	}
 )
 
 type RecurringBillController struct {
@@ -253,4 +256,55 @@ func stringInSlice(s string, slice []string) bool {
 		}
 	}
 	return false
+}
+
+// @Summary Update Recurring Bill Status
+// @Tags Recurring Bill
+// @Accept  json
+// @Produce  json
+// @Param  recurringBillId path int true "recurring bill id"
+// @Param  input body entity.UpdateBillRecurringStatus true "update bill status request (active/inactive)"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /recurring_bill/status/{recurringBillId} [put]
+func (r *RecurringBillController) UpdateStatusRecurringBill(c *fiber.Ctx) error {
+	functionName := "UpdateRecurringBill"
+
+	recurrBillId, err := c.ParamsInt("recurringBillId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing params item id, details = %v", err),
+		})
+	}
+
+	var input entity.UpdateBillRecurringStatus
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing item input, details = %v", err),
+		})
+	}
+
+	if !stringInSlice(input.Status, enumStatus) {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "status must be active or inactive",
+		})
+	}
+
+	_, _, err = r.recurringBillService.UpdateRecurringBill(int32(recurrBillId), &model.RecurringBill{
+		Status: input.Status,
+	})
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on updating recurring bill, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
+		Status: "successfully update recurring bill",
+	})
 }

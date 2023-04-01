@@ -13,3 +13,7 @@ type AddRecurringBillReq struct {
 	Attachments   []Attachment   `json:"bill_attachments"`
 	PaymentDue    int            `json:"recurring_bill_payment_due"`
 }
+
+type UpdateBillRecurringStatus struct {
+	Status string `json:"recurring_bill_status"`
+}
