@@ -197,6 +197,11 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 
 	var modelItemPurchases []model.ItemPurchase
 	for _, item := range input.Items {
+		itPurchasePpn := 0
+		if item.ItemPpn {
+			itPurchasePpn = 1
+		}
+
 		modelItemPurchases = append(modelItemPurchases, model.ItemPurchase{
 			ItemID:               item.ItemId,
 			BillID:               &bill.BillID,
@@ -204,6 +209,7 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 			ItemPurchaseQty:      item.ItemQty,
 			ItemPurchaseTime:     time.Now(),
 			ItemPurchaseDiscount: item.ItemDiscount,
+			ItemPurchasePpn:      int32(itPurchasePpn),
 		})
 	}
 	_, _, err = b.itemPurchaseService.CreateItemPurchase(modelItemPurchases)
@@ -298,12 +304,17 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 			amount = is.ItemPurchasePrice * float64(ip.ItemPurchaseQty)
 		}
 
+		itemPpn := false
+		if ip.ItemPurchasePpn == 1 {
+			itemPpn = true
+		}
 		itemBills = append(itemBills, entity.ItemBill{
 			Name:        item.ItemName,
 			Description: item.ItemDescription,
 			Qty:         ip.ItemPurchaseQty,
 			Price:       is.ItemPurchasePrice,
 			Amount:      amount,
+			ItemPpn:     itemPpn,
 		})
 	}
 
@@ -636,6 +647,9 @@ func (b *BillController) validateBillData(input struct {
 			return time.Time{}, time.Time{}, -1, fmt.Errorf("error on getting item with item id '%d' and supplier id  '%d' details = %v", item.ItemId, input.SupplierId, err)
 		}
 		total += it.ItemPurchasePrice*float64(item.ItemQty) - it.ItemPurchasePrice*float64(item.ItemQty)**item.ItemDiscount/100
+		if item.ItemPpn {
+			total += total * 11 / 100
+		}
 	}
 
 	return startDateTime, dueDateTime, total, nil

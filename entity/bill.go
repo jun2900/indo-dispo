@@ -29,6 +29,7 @@ type ItemPurchase struct {
 	ItemId       int32    `json:"item_id"`
 	ItemQty      int32    `json:"item_qty"`
 	ItemDiscount *float64 `json:"item_discount"`
+	ItemPpn      bool     `json:"item_ppn"`
 }
 
 type BillDetailsResp struct {
@@ -51,6 +52,7 @@ type ItemBill struct {
 	Qty         int32   `json:"item_qty"`
 	Price       float64 `json:"item_price"`
 	Amount      float64 `json:"item_amount"`
+	ItemPpn     bool    `json:"item_ppn"`
 }
 
 type BillHeaderResp struct {

@@ -1407,6 +1407,9 @@ const docTemplate_swagger = `{
                 "item_name": {
                     "type": "string"
                 },
+                "item_ppn": {
+                    "type": "boolean"
+                },
                 "item_price": {
                     "type": "number"
                 },
@@ -1423,6 +1426,9 @@ const docTemplate_swagger = `{
                 },
                 "item_id": {
                     "type": "integer"
+                },
+                "item_ppn": {
+                    "type": "boolean"
                 },
                 "item_qty": {
                     "type": "integer"

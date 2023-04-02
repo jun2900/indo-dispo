@@ -1397,6 +1397,9 @@
                 "item_name": {
                     "type": "string"
                 },
+                "item_ppn": {
+                    "type": "boolean"
+                },
                 "item_price": {
                     "type": "number"
                 },
@@ -1413,6 +1416,9 @@
                 },
                 "item_id": {
                     "type": "integer"
+                },
+                "item_ppn": {
+                    "type": "boolean"
                 },
                 "item_qty": {
                     "type": "integer"
