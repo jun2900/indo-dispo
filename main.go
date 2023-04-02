@@ -52,7 +52,7 @@ func main() {
 	readEnvironmentFile()
 
 	DB := infrastructure.OpenDbConnection()
-	go scheduleDailyTask(22, 27, 0, func() {
+	go scheduleDailyTask(0, 0, 0, func() {
 		scriptCheckRecurring(DB)
 	})
 
