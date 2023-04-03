@@ -1,4 +1,5 @@
-module anara
+module github.com/jun2900/indo-dispo
+
 
 go 1.20
 
