@@ -18,8 +18,8 @@ type RecurringBill struct {
 	Total         float64    `gorm:"column:total;not null" json:"total"`
 	Notes         *string    `gorm:"column:notes" json:"notes"`
 	ShippingCost  float64    `gorm:"column:shipping_cost;not null" json:"shipping_cost"`
-	AccountNumber string     `gorm:"column:account_number;not null" json:"account_number"`
-	BankName      string     `gorm:"column:bank_name;not null" json:"bank_name"`
+	AccountNumber *string    `gorm:"column:account_number" json:"account_number"`
+	BankName      *string    `gorm:"column:bank_name" json:"bank_name"`
 	StartDate     time.Time  `gorm:"column:start_date;not null" json:"start_date"`
 	EndDate       *time.Time `gorm:"column:end_date" json:"end_date"`
 	PaymentDue    int32      `gorm:"column:payment_due;not null" json:"payment_due"`

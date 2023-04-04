@@ -91,20 +91,6 @@ func (r *RecurringBillController) AddRecurringBill(c *fiber.Ctx) error {
 		})
 	}
 
-	if len(input.BankName) < 1 {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "bank name cannot be empty",
-		})
-	}
-
-	if len(input.AccountNumber) < 1 {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     "account number cannot be empty",
-		})
-	}
-
 	if input.PaymentDue < 1 {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
