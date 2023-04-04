@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -160,10 +161,23 @@ func (b *BalanceController) AddBalanceAmount(c *fiber.Ctx) error {
 		})
 	}
 
+	var attach *[]byte
+
+	if input.Attachment != nil {
+		at, err := base64.StdEncoding.DecodeString(*input.Attachment)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on decoding attachment, details = %v", err),
+			})
+		}
+		attach = &at
+	}
+
 	_, _, err = b.balanceLogService.CreateBalanceLog(&model.BalanceLog{
 		BalanceLogAmount:     input.Amount,
 		BalanceLogNotes:      input.Notes,
-		BalanceLogAttachment: input.Attachment,
+		BalanceLogAttachment: attach,
 		BalanceLogTimeAdded:  dateAddedTime,
 	})
 	if err != nil {

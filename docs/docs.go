@@ -1614,10 +1614,7 @@ const docTemplate_swagger = `{
                     "type": "number"
                 },
                 "balance_attachment": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "type": "string"
                 },
                 "balance_date_added": {
                     "type": "string"

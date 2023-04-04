@@ -281,9 +281,7 @@ definitions:
       balance_amount:
         type: number
       balance_attachment:
-        items:
-          type: integer
-        type: array
+        type: string
       balance_date_added:
         type: string
       balance_notes:
