@@ -163,6 +163,7 @@ func (r *RecurringBillController) AddRecurringBill(c *fiber.Ctx) error {
 		StartDate:     startDateTime,
 		EndDate:       endDate,
 		PaymentDue:    int32(input.PaymentDue),
+		Status:        "active",
 	})
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
