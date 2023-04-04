@@ -85,6 +85,18 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 	if len(input.WholeSalers) > 0 {
 		var wholeSalers []model.Wholesaler
 		for _, ws := range input.WholeSalers {
+			if ws.Price <= 0 {
+				return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
+					SourceFunction: functionName,
+					ErrMessage:     "price cannot below or equals to zero",
+				})
+			}
+			if ws.Qty <= 0 {
+				return c.Status(fiber.StatusInternalServerError).JSON(entity.ErrRespController{
+					SourceFunction: functionName,
+					ErrMessage:     "quantity cannot below or equals to zero",
+				})
+			}
 			wholeSalers = append(wholeSalers, model.Wholesaler{
 				ItemID:          item.ItemID,
 				WholesalerQty:   ws.Qty,
