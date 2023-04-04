@@ -7,8 +7,8 @@ type AddBillReq struct {
 	BillType      string         `json:"bill_type"`
 	Attachments   []Attachment   `json:"bill_attachments"`
 	Items         []ItemPurchase `json:"bill_items"`
-	BankName      string         `json:"bill_bank_name"`
-	AccountNumber string         `json:"bill_account_number"`
+	BankName      *string        `json:"bill_bank_name"`
+	AccountNumber *string        `json:"bill_account_number"`
 	ShippingCost  float64        `json:"bill_shipping_cost"`
 	BillNote      *string        `json:"bill_notes"`
 }
@@ -19,8 +19,8 @@ type UpdateBillReq struct {
 	DueDate       string         `json:"bill_due_date"`
 	Attachments   []Attachment   `json:"bill_attachments"`
 	Items         []ItemPurchase `json:"bill_items"`
-	BankName      string         `json:"bill_bank_name"`
-	AccountNumber string         `json:"bill_account_number"`
+	BankName      *string        `json:"bill_bank_name"`
+	AccountNumber *string        `json:"bill_account_number"`
 	ShippingCost  float64        `json:"bill_shipping_cost"`
 	BillNote      *string        `json:"bill_notes"`
 }

@@ -22,8 +22,8 @@ type Bill struct {
 	BillStatus        string    `gorm:"column:bill_status;not null" json:"bill_status"`
 	BillType          string    `gorm:"column:bill_type;not null" json:"bill_type"`
 	BillShippingCost  float64   `gorm:"column:bill_shipping_cost;not null" json:"bill_shipping_cost"`
-	BillAccountNumber string    `gorm:"column:bill_account_number;not null" json:"bill_account_number"`
-	BillBankName      string    `gorm:"column:bill_bank_name;not null" json:"bill_bank_name"`
+	BillAccountNumber *string   `gorm:"column:bill_account_number" json:"bill_account_number"`
+	BillBankName      *string   `gorm:"column:bill_bank_name" json:"bill_bank_name"`
 	BillNotes         *string   `gorm:"column:bill_notes" json:"bill_notes"`
 	RecurringBillID   *int32    `gorm:"column:recurring_bill_id" json:"recurring_bill_id"`
 }

@@ -127,19 +127,15 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 	}
 
 	startDateTime, dueDateTime, total, err := b.validateBillData(struct {
-		StartDate     string
-		DueDate       string
-		Items         []entity.ItemPurchase
-		BankName      string
-		AccountNumber string
-		SupplierId    int32
+		StartDate  string
+		DueDate    string
+		Items      []entity.ItemPurchase
+		SupplierId int32
 	}{
-		StartDate:     input.StartDate,
-		DueDate:       input.DueDate,
-		Items:         input.Items,
-		BankName:      input.BankName,
-		AccountNumber: input.AccountNumber,
-		SupplierId:    input.SupplierId,
+		StartDate:  input.StartDate,
+		DueDate:    input.DueDate,
+		Items:      input.Items,
+		SupplierId: input.SupplierId,
 	})
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
@@ -455,19 +451,15 @@ func (b *BillController) UpdateBill(c *fiber.Ctx) error {
 	}
 
 	startDateTime, dueDateTime, total, err := b.validateBillData(struct {
-		StartDate     string
-		DueDate       string
-		Items         []entity.ItemPurchase
-		BankName      string
-		AccountNumber string
-		SupplierId    int32
+		StartDate  string
+		DueDate    string
+		Items      []entity.ItemPurchase
+		SupplierId int32
 	}{
-		StartDate:     input.StartDate,
-		DueDate:       input.DueDate,
-		Items:         input.Items,
-		BankName:      input.BankName,
-		AccountNumber: input.AccountNumber,
-		SupplierId:    input.SupplierId,
+		StartDate:  input.StartDate,
+		DueDate:    input.DueDate,
+		Items:      input.Items,
+		SupplierId: input.SupplierId,
 	})
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
@@ -603,12 +595,10 @@ func (b *BillController) deleteRelatedBillThings(billId int32) (bill *model.Bill
 }
 
 func (b *BillController) validateBillData(input struct {
-	StartDate     string
-	DueDate       string
-	Items         []entity.ItemPurchase
-	BankName      string
-	AccountNumber string
-	SupplierId    int32
+	StartDate  string
+	DueDate    string
+	Items      []entity.ItemPurchase
+	SupplierId int32
 }) (startDateTime time.Time, dueDateTime time.Time, total float64, err error) {
 	startDateTime, err = time.Parse(layoutTime, input.StartDate)
 	if err != nil {
@@ -622,14 +612,6 @@ func (b *BillController) validateBillData(input struct {
 
 	if len(input.Items) < 1 {
 		return time.Time{}, time.Time{}, -1, errors.New("items cannot be empty")
-	}
-
-	if len(input.BankName) < 1 {
-		return time.Time{}, time.Time{}, -1, errors.New("bank name cannot be empty")
-	}
-
-	if len(input.AccountNumber) < 1 {
-		return time.Time{}, time.Time{}, -1, errors.New("account number cannot be empty")
 	}
 
 	supplier, _, err := b.supplierService.GetSupplier(input.SupplierId)
