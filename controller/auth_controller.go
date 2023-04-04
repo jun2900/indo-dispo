@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"anara/entity"
-	"anara/services"
 	"fmt"
 	"os"
 	"time"
+
+	"github.com/jun2900/indo-dispo/entity"
+	"github.com/jun2900/indo-dispo/services"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"

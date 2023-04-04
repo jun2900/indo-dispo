@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"anara/entity"
-	"anara/model"
-	"anara/services"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/jun2900/indo-dispo/entity"
+	"github.com/jun2900/indo-dispo/model"
+	"github.com/jun2900/indo-dispo/services"
 
 	"github.com/gofiber/fiber/v2"
 )

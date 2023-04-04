@@ -1,10 +1,6 @@
 package main
 
 import (
-	"anara/controller"
-	"anara/infrastructure"
-	"anara/model"
-	"anara/services"
 	"crypto/rand"
 	"fmt"
 	"log"
@@ -13,8 +9,13 @@ import (
 	"strings"
 	"time"
 
-	_ "anara/docs"
-	"anara/middleware"
+	"github.com/jun2900/indo-dispo/controller"
+	"github.com/jun2900/indo-dispo/infrastructure"
+	"github.com/jun2900/indo-dispo/model"
+	"github.com/jun2900/indo-dispo/services"
+
+	_ "github.com/jun2900/indo-dispo/docs"
+	"github.com/jun2900/indo-dispo/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"

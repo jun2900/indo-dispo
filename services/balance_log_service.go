@@ -1,8 +1,9 @@
 package services
 
 import (
-	"anara/model"
 	"time"
+
+	"github.com/jun2900/indo-dispo/model"
 
 	"gorm.io/gorm"
 )

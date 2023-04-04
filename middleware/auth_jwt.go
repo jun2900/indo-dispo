@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"anara/entity"
 	"os"
+
+	"github.com/jun2900/indo-dispo/entity"
 
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v2"
