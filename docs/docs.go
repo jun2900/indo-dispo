@@ -1218,6 +1218,9 @@ const docTemplate_swagger = `{
                 "bill_type": {
                     "type": "string"
                 },
+                "bill_unit": {
+                    "type": "string"
+                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1291,6 +1294,9 @@ const docTemplate_swagger = `{
                 "recurring_bill_start_date": {
                     "type": "string"
                 },
+                "recurring_bill_unit": {
+                    "type": "string"
+                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1350,6 +1356,9 @@ const docTemplate_swagger = `{
                     "type": "integer"
                 },
                 "bill_type": {
+                    "type": "string"
+                },
+                "bill_unit": {
                     "type": "string"
                 }
             }
@@ -1665,6 +1674,9 @@ const docTemplate_swagger = `{
                 "bill_start_date": {
                     "type": "string"
                 },
+                "bill_unit": {
+                    "type": "string"
+                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1768,6 +1780,9 @@ const docTemplate_swagger = `{
                 },
                 "total": {
                     "type": "number"
+                },
+                "unit": {
+                    "type": "string"
                 }
             }
         },

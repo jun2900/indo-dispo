@@ -1208,6 +1208,9 @@
                 "bill_type": {
                     "type": "string"
                 },
+                "bill_unit": {
+                    "type": "string"
+                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1281,6 +1284,9 @@
                 "recurring_bill_start_date": {
                     "type": "string"
                 },
+                "recurring_bill_unit": {
+                    "type": "string"
+                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1340,6 +1346,9 @@
                     "type": "integer"
                 },
                 "bill_type": {
+                    "type": "string"
+                },
+                "bill_unit": {
                     "type": "string"
                 }
             }
@@ -1655,6 +1664,9 @@
                 "bill_start_date": {
                     "type": "string"
                 },
+                "bill_unit": {
+                    "type": "string"
+                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1758,6 +1770,9 @@
                 },
                 "total": {
                     "type": "number"
+                },
+                "unit": {
+                    "type": "string"
                 }
             }
         },
