@@ -325,17 +325,19 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(entity.BillDetailsResp{
-		StartDate:        bill.BillStartDate.Format(layoutTime),
-		DueDate:          bill.BillDueDate.Format(layoutTime),
-		BillNumber:       bill.BillNumber,
-		BillOrderNumber:  bill.BillOrderNumber,
-		BillType:         bill.BillType,
-		Attachments:      attachments,
-		Items:            itemBills,
-		BillStatus:       bill.BillStatus,
-		BillSubTotal:     int64(subTotal),
-		BillTotal:        int64(total),
-		BillShippingCost: bill.BillShippingCost,
+		StartDate:         bill.BillStartDate.Format(layoutTime),
+		DueDate:           bill.BillDueDate.Format(layoutTime),
+		BillNumber:        bill.BillNumber,
+		BillOrderNumber:   bill.BillOrderNumber,
+		BillType:          bill.BillType,
+		Attachments:       attachments,
+		Items:             itemBills,
+		BillStatus:        bill.BillStatus,
+		BillSubTotal:      int64(subTotal),
+		BillTotal:         int64(total),
+		BillShippingCost:  bill.BillShippingCost,
+		BillAccountNumber: bill.BillAccountNumber,
+		BillBankName:      bill.BillBankName,
 	})
 }
 

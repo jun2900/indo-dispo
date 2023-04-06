@@ -85,10 +85,14 @@ definitions:
     type: object
   entity.BillDetailsResp:
     properties:
+      bill_account_number:
+        type: string
       bill_attachments:
         items:
           $ref: '#/definitions/entity.Attachment'
         type: array
+      bill_bank_name:
+        type: string
       bill_due_date:
         type: string
       bill_items:

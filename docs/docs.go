@@ -1313,11 +1313,17 @@ const docTemplate_swagger = `{
         "entity.BillDetailsResp": {
             "type": "object",
             "properties": {
+                "bill_account_number": {
+                    "type": "string"
+                },
                 "bill_attachments": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/entity.Attachment"
                     }
+                },
+                "bill_bank_name": {
+                    "type": "string"
                 },
                 "bill_due_date": {
                     "type": "string"

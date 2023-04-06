@@ -34,17 +34,19 @@ type ItemPurchase struct {
 }
 
 type BillDetailsResp struct {
-	StartDate        string       `json:"bill_start_date"`
-	DueDate          string       `json:"bill_due_date"`
-	BillNumber       string       `json:"bill_number"`
-	BillOrderNumber  *string      `json:"bill_order_number"`
-	BillType         string       `json:"bill_type"`
-	Attachments      []Attachment `json:"bill_attachments"`
-	Items            []ItemBill   `json:"bill_items"`
-	BillStatus       string       `json:"bill_status"`
-	BillSubTotal     int64        `json:"bill_subtotal"`
-	BillTotal        int64        `json:"bill_total"`
-	BillShippingCost float64      `json:"bill_shipping_cost"`
+	StartDate         string       `json:"bill_start_date"`
+	DueDate           string       `json:"bill_due_date"`
+	BillNumber        string       `json:"bill_number"`
+	BillOrderNumber   *string      `json:"bill_order_number"`
+	BillType          string       `json:"bill_type"`
+	Attachments       []Attachment `json:"bill_attachments"`
+	Items             []ItemBill   `json:"bill_items"`
+	BillStatus        string       `json:"bill_status"`
+	BillSubTotal      int64        `json:"bill_subtotal"`
+	BillTotal         int64        `json:"bill_total"`
+	BillShippingCost  float64      `json:"bill_shipping_cost"`
+	BillAccountNumber *string      `json:"bill_account_number"`
+	BillBankName      *string      `json:"bill_bank_name"`
 }
 
 type ItemBill struct {
