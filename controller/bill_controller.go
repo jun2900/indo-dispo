@@ -313,6 +313,7 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 			Price:       is.ItemPurchasePrice,
 			Amount:      amount,
 			ItemPpn:     itemPpn,
+			ItemUnit:    ip.ItemPurchaseUnit,
 		})
 	}
 

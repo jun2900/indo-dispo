@@ -45,7 +45,6 @@ type BillDetailsResp struct {
 	BillSubTotal     int64        `json:"bill_subtotal"`
 	BillTotal        int64        `json:"bill_total"`
 	BillShippingCost float64      `json:"bill_shipping_cost"`
-	Unit             string       `json:"bill_unit"`
 }
 
 type ItemBill struct {
@@ -55,6 +54,7 @@ type ItemBill struct {
 	Price       float64 `json:"item_price"`
 	Amount      float64 `json:"item_amount"`
 	ItemPpn     bool    `json:"item_ppn"`
+	ItemUnit    string  `json:"item_unit"`
 }
 
 type BillHeaderResp struct {

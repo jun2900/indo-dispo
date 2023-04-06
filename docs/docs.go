@@ -1351,9 +1351,6 @@ const docTemplate_swagger = `{
                 },
                 "bill_type": {
                     "type": "string"
-                },
-                "bill_unit": {
-                    "type": "string"
                 }
             }
         },
@@ -1418,6 +1415,9 @@ const docTemplate_swagger = `{
                 },
                 "item_qty": {
                     "type": "integer"
+                },
+                "item_unit": {
+                    "type": "string"
                 }
             }
         },

@@ -111,8 +111,6 @@ definitions:
         type: integer
       bill_type:
         type: string
-      bill_unit:
-        type: string
     type: object
   entity.BillHeaderResp:
     properties:
@@ -154,6 +152,8 @@ definitions:
         type: number
       item_qty:
         type: integer
+      item_unit:
+        type: string
     type: object
   entity.ItemPurchase:
     properties:

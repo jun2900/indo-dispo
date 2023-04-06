@@ -1341,9 +1341,6 @@
                 },
                 "bill_type": {
                     "type": "string"
-                },
-                "bill_unit": {
-                    "type": "string"
                 }
             }
         },
@@ -1408,6 +1405,9 @@
                 },
                 "item_qty": {
                     "type": "integer"
+                },
+                "item_unit": {
+                    "type": "string"
                 }
             }
         },
