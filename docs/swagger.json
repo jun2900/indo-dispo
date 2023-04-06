@@ -1208,9 +1208,6 @@
                 "bill_type": {
                     "type": "string"
                 },
-                "bill_unit": {
-                    "type": "string"
-                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1431,6 +1428,9 @@
                 },
                 "item_qty": {
                     "type": "integer"
+                },
+                "item_unit": {
+                    "type": "string"
                 }
             }
         },
@@ -1664,9 +1664,6 @@
                 "bill_start_date": {
                     "type": "string"
                 },
-                "bill_unit": {
-                    "type": "string"
-                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1770,9 +1767,6 @@
                 },
                 "total": {
                     "type": "number"
-                },
-                "unit": {
-                    "type": "string"
                 }
             }
         },

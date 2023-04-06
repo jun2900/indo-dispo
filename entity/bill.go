@@ -11,7 +11,6 @@ type AddBillReq struct {
 	AccountNumber *string        `json:"bill_account_number"`
 	ShippingCost  float64        `json:"bill_shipping_cost"`
 	BillNote      *string        `json:"bill_notes"`
-	Unit          string         `json:"bill_unit"`
 }
 
 type UpdateBillReq struct {
@@ -24,7 +23,6 @@ type UpdateBillReq struct {
 	AccountNumber *string        `json:"bill_account_number"`
 	ShippingCost  float64        `json:"bill_shipping_cost"`
 	BillNote      *string        `json:"bill_notes"`
-	Unit          string         `json:"bill_unit"`
 }
 
 type ItemPurchase struct {
@@ -32,6 +30,7 @@ type ItemPurchase struct {
 	ItemQty      int32    `json:"item_qty"`
 	ItemDiscount *float64 `json:"item_discount"`
 	ItemPpn      bool     `json:"item_ppn"`
+	ItemUnit     string   `json:"item_unit"`
 }
 
 type BillDetailsResp struct {

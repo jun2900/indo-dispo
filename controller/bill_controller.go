@@ -131,13 +131,11 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		DueDate    string
 		Items      []entity.ItemPurchase
 		SupplierId int32
-		Unit       string
 	}{
 		StartDate:  input.StartDate,
 		DueDate:    input.DueDate,
 		Items:      input.Items,
 		SupplierId: input.SupplierId,
-		Unit:       input.Unit,
 	})
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
@@ -164,7 +162,6 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		BillAccountNumber: input.AccountNumber,
 		BillBankName:      input.BankName,
 		BillNotes:         input.BillNote,
-		BillUnit:          input.Unit,
 	})
 
 	if err != nil {
@@ -210,6 +207,7 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 			ItemPurchaseTime:     time.Now(),
 			ItemPurchaseDiscount: item.ItemDiscount,
 			ItemPurchasePpn:      int32(itPurchasePpn),
+			ItemPurchaseUnit:     item.ItemUnit,
 		})
 	}
 	_, _, err = b.itemPurchaseService.CreateItemPurchase(modelItemPurchases)
@@ -458,13 +456,11 @@ func (b *BillController) UpdateBill(c *fiber.Ctx) error {
 		DueDate    string
 		Items      []entity.ItemPurchase
 		SupplierId int32
-		Unit       string
 	}{
 		StartDate:  input.StartDate,
 		DueDate:    input.DueDate,
 		Items:      input.Items,
 		SupplierId: input.SupplierId,
-		Unit:       input.Unit,
 	})
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
@@ -482,7 +478,6 @@ func (b *BillController) UpdateBill(c *fiber.Ctx) error {
 		BillAccountNumber: input.AccountNumber,
 		BillBankName:      input.BankName,
 		BillNotes:         input.BillNote,
-		BillUnit:          input.Unit,
 	})
 
 	if err != nil {
@@ -522,6 +517,7 @@ func (b *BillController) UpdateBill(c *fiber.Ctx) error {
 			ItemPurchaseQty:      item.ItemQty,
 			ItemPurchaseTime:     time.Now(),
 			ItemPurchaseDiscount: item.ItemDiscount,
+			ItemPurchaseUnit:     item.ItemUnit,
 		})
 	}
 	_, _, err = b.itemPurchaseService.CreateItemPurchase(modelItemPurchases)
@@ -605,7 +601,6 @@ func (b *BillController) validateBillData(input struct {
 	DueDate    string
 	Items      []entity.ItemPurchase
 	SupplierId int32
-	Unit       string
 }) (startDateTime time.Time, dueDateTime time.Time, total float64, err error) {
 	startDateTime, err = time.Parse(layoutTime, input.StartDate)
 	if err != nil {
@@ -628,10 +623,6 @@ func (b *BillController) validateBillData(input struct {
 
 	if strings.ToLower(supplier.SupplierType) != "vendor" {
 		return time.Time{}, time.Time{}, -1, errors.New("supplier is not a vendor")
-	}
-
-	if len(input.Unit) < 1 {
-		return time.Time{}, time.Time{}, -1, errors.New("unit cannot be empty")
 	}
 
 	total = 0

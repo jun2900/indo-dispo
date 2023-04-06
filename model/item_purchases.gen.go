@@ -20,6 +20,7 @@ type ItemPurchase struct {
 	ItemPurchaseTime     time.Time `gorm:"column:item_purchase_time;not null" json:"item_purchase_time"`
 	ItemPurchaseDiscount *float64  `gorm:"column:item_purchase_discount" json:"item_purchase_discount"`
 	ItemPurchasePpn      int32     `gorm:"column:item_purchase_ppn;not null" json:"item_purchase_ppn"`
+	ItemPurchaseUnit     string    `gorm:"column:item_purchase_unit;not null" json:"item_purchase_unit"`
 }
 
 // TableName ItemPurchase's table name

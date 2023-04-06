@@ -23,7 +23,6 @@ type RecurringBill struct {
 	StartDate     time.Time  `gorm:"column:start_date;not null" json:"start_date"`
 	EndDate       *time.Time `gorm:"column:end_date" json:"end_date"`
 	PaymentDue    int32      `gorm:"column:payment_due;not null" json:"payment_due"`
-	Unit          string     `gorm:"column:unit;not null" json:"unit"`
 	Status        string     `gorm:"column:status;not null" json:"status"`
 }
 

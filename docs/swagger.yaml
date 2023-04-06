@@ -23,8 +23,6 @@ definitions:
         type: string
       bill_type:
         type: string
-      bill_unit:
-        type: string
       supplier_id:
         type: integer
     type: object
@@ -169,6 +167,8 @@ definitions:
         type: boolean
       item_qty:
         type: integer
+      item_unit:
+        type: string
     type: object
   entity.ListItemBySupplierResp:
     properties:
@@ -320,8 +320,6 @@ definitions:
         type: number
       bill_start_date:
         type: string
-      bill_unit:
-        type: string
       supplier_id:
         type: integer
     type: object
@@ -390,8 +388,6 @@ definitions:
         type: integer
       total:
         type: number
-      unit:
-        type: string
     type: object
   model.Supplier:
     properties:

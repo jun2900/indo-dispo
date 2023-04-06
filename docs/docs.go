@@ -1218,9 +1218,6 @@ const docTemplate_swagger = `{
                 "bill_type": {
                     "type": "string"
                 },
-                "bill_unit": {
-                    "type": "string"
-                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1441,6 +1438,9 @@ const docTemplate_swagger = `{
                 },
                 "item_qty": {
                     "type": "integer"
+                },
+                "item_unit": {
+                    "type": "string"
                 }
             }
         },
@@ -1674,9 +1674,6 @@ const docTemplate_swagger = `{
                 "bill_start_date": {
                     "type": "string"
                 },
-                "bill_unit": {
-                    "type": "string"
-                },
                 "supplier_id": {
                     "type": "integer"
                 }
@@ -1780,9 +1777,6 @@ const docTemplate_swagger = `{
                 },
                 "total": {
                     "type": "number"
-                },
-                "unit": {
-                    "type": "string"
                 }
             }
         },
