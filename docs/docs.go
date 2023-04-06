@@ -1291,9 +1291,6 @@ const docTemplate_swagger = `{
                 "recurring_bill_start_date": {
                     "type": "string"
                 },
-                "recurring_bill_unit": {
-                    "type": "string"
-                },
                 "supplier_id": {
                     "type": "integer"
                 }

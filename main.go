@@ -265,6 +265,8 @@ func insertingAttachmentAndItemPurchase(db *gorm.DB, recurringTxn model.Recurrin
 			ItemPurchaseQty:      mip.ItemPurchaseQty,
 			ItemPurchaseTime:     mip.ItemPurchaseTime,
 			ItemPurchaseDiscount: mip.ItemPurchaseDiscount,
+			ItemPurchasePpn:      mip.ItemPurchasePpn,
+			ItemPurchaseUnit:     mip.ItemPurchaseUnit,
 		})
 	}
 	if err := db.Model(&model.ItemPurchase{}).Save(&inputModelItemPurchases).Error; err != nil {

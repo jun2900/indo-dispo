@@ -510,13 +510,18 @@ func (b *BillController) UpdateBill(c *fiber.Ctx) error {
 
 	var modelItemPurchases []model.ItemPurchase
 	for _, item := range input.Items {
+		itPurchasePpn := 0
+		if item.ItemPpn {
+			itPurchasePpn = 1
+		}
+
 		modelItemPurchases = append(modelItemPurchases, model.ItemPurchase{
 			ItemID:               item.ItemId,
 			BillID:               &bill.BillID,
-			RecurringBillID:      nil,
 			ItemPurchaseQty:      item.ItemQty,
 			ItemPurchaseTime:     time.Now(),
 			ItemPurchaseDiscount: item.ItemDiscount,
+			ItemPurchasePpn:      int32(itPurchasePpn),
 			ItemPurchaseUnit:     item.ItemUnit,
 		})
 	}

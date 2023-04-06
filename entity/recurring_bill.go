@@ -12,7 +12,6 @@ type AddRecurringBillReq struct {
 	EndDate       *string        `json:"recurring_bill_end_date"`
 	Attachments   []Attachment   `json:"bill_attachments"`
 	PaymentDue    int            `json:"recurring_bill_payment_due"`
-	Unit          string         `json:"recurring_bill_unit"`
 }
 
 type UpdateBillRecurringStatus struct {
