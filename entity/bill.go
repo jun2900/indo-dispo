@@ -50,6 +50,7 @@ type BillDetailsResp struct {
 }
 
 type ItemBill struct {
+	Id          int32   `json:"item_id"`
 	Name        string  `json:"item_name"`
 	Description *string `json:"item_description"`
 	Qty         int32   `json:"item_qty"`

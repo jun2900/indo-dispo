@@ -307,6 +307,7 @@ func (b *BillController) GetBillDetail(c *fiber.Ctx) error {
 			itemPpn = true
 		}
 		itemBills = append(itemBills, entity.ItemBill{
+			Id:          item.ItemID,
 			Name:        item.ItemName,
 			Description: item.ItemDescription,
 			Qty:         ip.ItemPurchaseQty,

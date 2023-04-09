@@ -1410,6 +1410,9 @@ const docTemplate_swagger = `{
                 "item_description": {
                     "type": "string"
                 },
+                "item_id": {
+                    "type": "integer"
+                },
                 "item_name": {
                     "type": "string"
                 },
