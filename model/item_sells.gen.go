@@ -12,10 +12,14 @@ const TableNameItemSell = "item_sells"
 
 // ItemSell mapped from table <item_sells>
 type ItemSell struct {
-	ItemSellID   int32     `gorm:"column:item_sell_id;primaryKey;autoIncrement:false" json:"item_sell_id"`
-	ItemID       int32     `gorm:"column:item_id;not null" json:"item_id"`
-	InvoiceID    int32     `gorm:"column:invoice_id;not null" json:"invoice_id"`
-	ItemSellTime time.Time `gorm:"column:item_sell_time;not null" json:"item_sell_time"`
+	ItemSellID       int32     `gorm:"column:item_sell_id;primaryKey;autoIncrement:true" json:"item_sell_id"`
+	ItemID           int32     `gorm:"column:item_id;not null" json:"item_id"`
+	InvoiceID        int32     `gorm:"column:invoice_id;not null" json:"invoice_id"`
+	ItemSellQty      int32     `gorm:"column:item_sell_qty;not null" json:"item_sell_qty"`
+	ItemSellTime     time.Time `gorm:"column:item_sell_time;not null" json:"item_sell_time"`
+	ItemSellDiscount *float64  `gorm:"column:item_sell_discount" json:"item_sell_discount"`
+	ItemSellPpn      int32     `gorm:"column:item_sell_ppn;not null" json:"item_sell_ppn"`
+	ItemSellUnit     string    `gorm:"column:item_sell_unit;not null" json:"item_sell_unit"`
 }
 
 // TableName ItemSell's table name

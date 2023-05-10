@@ -572,6 +572,51 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/invoice": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Register Invoice",
+                "parameters": [
+                    {
+                        "description": "add invoice request",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.AddInvoiceReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/item": {
             "post": {
                 "consumes": [
@@ -1220,6 +1265,59 @@ const docTemplate_swagger = `{
                 },
                 "supplier_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "entity.AddInvoiceReq": {
+            "type": "object",
+            "properties": {
+                "customer_id": {
+                    "type": "integer"
+                },
+                "invoice_account_number": {
+                    "type": "string"
+                },
+                "invoice_attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Attachment"
+                    }
+                },
+                "invoice_bank_name": {
+                    "type": "string"
+                },
+                "invoice_due_date": {
+                    "type": "string"
+                },
+                "invoice_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ItemPurchase"
+                    }
+                },
+                "invoice_logo": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "invoice_notes": {
+                    "type": "string"
+                },
+                "invoice_shipping_cost": {
+                    "type": "number"
+                },
+                "invoice_start_date": {
+                    "type": "string"
+                },
+                "invoice_subheading": {
+                    "type": "string"
+                },
+                "invoice_title": {
+                    "type": "string"
+                },
+                "invoice_type": {
+                    "type": "string"
                 }
             }
         },

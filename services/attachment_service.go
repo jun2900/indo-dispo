@@ -10,6 +10,7 @@ type AttachmentService interface {
 	GetAttachmentByBillId(billId int32) (results []model.Attachment, totalRows int64, err error)
 	CreateAttachments(record []model.Attachment) (result []model.Attachment, RowsAffected int64, err error)
 	DeleteAttachmentByBillId(billId int32) (err error)
+	WithTrx(*gorm.DB) *mysqlDBRepository
 }
 
 func NewAttachmentService(mysqlConnection *gorm.DB) AttachmentService {

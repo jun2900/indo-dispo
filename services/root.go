@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 
 	"gorm.io/gorm"
@@ -56,4 +57,14 @@ func Copy(dst interface{}, src interface{}) error {
 
 func isZeroOfUnderlyingType(x interface{}) bool {
 	return x == nil || reflect.DeepEqual(x, reflect.Zero(reflect.TypeOf(x)).Interface())
+}
+
+func (r *mysqlDBRepository) WithTrx(trxHandle *gorm.DB) *mysqlDBRepository {
+	if trxHandle == nil {
+		log.Print("Transaction Database not found")
+		return r
+	}
+	log.Print("Transaction Database found")
+	r.mysql = trxHandle
+	return r
 }

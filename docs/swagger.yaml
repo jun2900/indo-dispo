@@ -26,6 +26,41 @@ definitions:
       supplier_id:
         type: integer
     type: object
+  entity.AddInvoiceReq:
+    properties:
+      customer_id:
+        type: integer
+      invoice_account_number:
+        type: string
+      invoice_attachments:
+        items:
+          $ref: '#/definitions/entity.Attachment'
+        type: array
+      invoice_bank_name:
+        type: string
+      invoice_due_date:
+        type: string
+      invoice_items:
+        items:
+          $ref: '#/definitions/entity.ItemPurchase'
+        type: array
+      invoice_logo:
+        items:
+          type: integer
+        type: array
+      invoice_notes:
+        type: string
+      invoice_shipping_cost:
+        type: number
+      invoice_start_date:
+        type: string
+      invoice_subheading:
+        type: string
+      invoice_title:
+        type: string
+      invoice_type:
+        type: string
+    type: object
   entity.AddItemReq:
     properties:
       item_description:
@@ -810,6 +845,35 @@ paths:
       summary: List All Bill
       tags:
       - Bill
+  /invoice:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: add invoice request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.AddInvoiceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Register Invoice
+      tags:
+      - Invoice
   /item:
     post:
       consumes:
