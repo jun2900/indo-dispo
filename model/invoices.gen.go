@@ -21,6 +21,7 @@ type Invoice struct {
 	InvoiceTitle       *string   `gorm:"column:invoice_title" json:"invoice_title"`
 	InvoiceSubheading  *string   `gorm:"column:invoice_subheading" json:"invoice_subheading"`
 	InvoiceLogo        *[]byte   `gorm:"column:invoice_logo" json:"invoice_logo"`
+	InvoiceTotal       float64   `gorm:"column:invoice_total;not null" json:"invoice_total"`
 	InvoiceStatus      string    `gorm:"column:invoice_status;not null" json:"invoice_status"`
 }
 

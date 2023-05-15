@@ -34,6 +34,77 @@ func NewInvoiceController(invoiceService services.InvoiceService, supplierServic
 	}
 }
 
+// @Summary List All Invoices
+// @Tags Invoice
+// @Accept  json
+// @Produce  json
+// @Param       page     				query    int    false "page requested (defaults to 0)"
+// @Param       pagesize 				query    int    false "number of records in a page  (defaults to 20)"
+// @Param       order    				query    string false "asc / desc"
+// @Param status query string false "filter by invoice status"
+// @Param customer query string false "filter by customer name"
+// @Param invoiceType query string false "filter by invoice type"
+// @Param   dateFrom    query    string  false        "search lower limit start date time"
+// @Param   dateTo    query    string  false        "search upper limit start date time"
+// @Success 200 {object} entity.PagedResults{Data=[]model.VSupplierInvoice}
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /invoices [get]
+func (i *InvoiceController) GetAllInvoices(c *fiber.Ctx) error {
+	functionName := "GetAllInvoices"
+
+	status := c.Query("status", "")
+	customer := c.Query("customer", "")
+
+	order := c.Query("order", "")
+	page := c.QueryInt("page", 0)
+	pagesize := c.QueryInt("pagesize", 20)
+
+	dateFrom := c.Query("dateFrom", "")
+	dateTo := c.Query("dateTo", "")
+
+	var dateFromTime time.Time
+	var dateToTime time.Time
+	var err error
+
+	if dateFrom != "" {
+		dateFromTime, err = time.Parse(layoutTime, dateFrom)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on parsing date from time, details = %v", err),
+			})
+		}
+	}
+
+	if dateTo != "" {
+		dateToTime, err = time.Parse(layoutTime, dateTo)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on parsing date to time, details = %v", err),
+			})
+		}
+	}
+
+	trxHandle := c.Locals("db_trx").(*gorm.DB)
+
+	bills, totalRows, err := i.invoiceService.WithTrx(trxHandle).GetAllInvoices(page, pagesize, order, status, customer, dateFromTime, dateToTime)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting invoices, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.PagedResults{
+		Page:         page,
+		PageSize:     pagesize,
+		Data:         bills,
+		TotalRecords: int(totalRows),
+	})
+}
+
 // @Summary Register Invoice
 // @Tags Invoice
 // @Accept  json
@@ -111,15 +182,15 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 	trxHandle := c.Locals("db_trx").(*gorm.DB)
 
 	invoice, _, err := i.invoiceService.WithTrx(trxHandle).CreateInvoice(&model.Invoice{
-		SupplierID:         input.CustomerId,
-		InvoiceStartDate:   startDateTime,
-		InvoiceDueDate:     dueDateTime,
-		InvoiceNumber:      invoiceNumber,
-		InvoiceOrderNumber: nil,
-		InvoiceTitle:       input.Title,
-		InvoiceSubheading:  input.Subheading,
-		InvoiceLogo:        input.Logo,
-		InvoiceStatus:      "MENUNGGU PEMBAYARAN",
+		SupplierID:        input.CustomerId,
+		InvoiceStartDate:  startDateTime,
+		InvoiceDueDate:    dueDateTime,
+		InvoiceNumber:     invoiceNumber,
+		InvoiceTitle:      input.Title,
+		InvoiceSubheading: input.Subheading,
+		InvoiceLogo:       input.Logo,
+		InvoiceTotal:      total,
+		InvoiceStatus:     "MENUNGGU PEMBAYARAN",
 	})
 	if err != nil {
 		log.Println("testt create invoice err")
@@ -181,12 +252,12 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := trxHandle.Commit().Error; err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
-			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on commiting transcation, details = %v", err),
-		})
-	}
+	//if err := trxHandle.Commit().Error; err != nil {
+	//	return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+	//		SourceFunction: functionName,
+	//		ErrMessage:     fmt.Sprintf("error on commiting transcation, details = %v", err),
+	//	})
+	//}
 
 	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{
 		Status: "successfully created invoices",

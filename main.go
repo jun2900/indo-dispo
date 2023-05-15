@@ -117,6 +117,7 @@ func main() {
 	app.Post("/recurring_bill", recurringBillController.AddRecurringBill)
 	app.Put("recurring_bill/status/:recurringBillId", recurringBillController.UpdateStatusRecurringBill)
 
+	app.Get("/invoices", middleware.DBTransactionMiddleware(DB), invoiceController.GetAllInvoices)
 	app.Post("/invoice", middleware.DBTransactionMiddleware(DB), invoiceController.CreateInvoice)
 
 	app.Post("/admin/login", adminController.Login)

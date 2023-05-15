@@ -617,6 +617,105 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/invoices": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "List All Invoices",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page requested (defaults to 0)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "number of records in a page  (defaults to 20)",
+                        "name": "pagesize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "asc / desc",
+                        "name": "order",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter by invoice status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter by customer name",
+                        "name": "customer",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter by invoice type",
+                        "name": "invoiceType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "search lower limit start date time",
+                        "name": "dateFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "search upper limit start date time",
+                        "name": "dateTo",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/entity.PagedResults"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "Data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.VSupplierInvoice"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/item": {
             "post": {
                 "consumes": [
@@ -1962,6 +2061,38 @@ const docTemplate_swagger = `{
                     "type": "string"
                 },
                 "supplier_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.VSupplierInvoice": {
+            "type": "object",
+            "properties": {
+                "invoice_due_date": {
+                    "type": "string"
+                },
+                "invoice_number": {
+                    "type": "string"
+                },
+                "invoice_start_date": {
+                    "type": "string"
+                },
+                "invoice_status": {
+                    "type": "string"
+                },
+                "invoice_title": {
+                    "type": "string"
+                },
+                "invoice_total": {
+                    "type": "number"
+                },
+                "invoices_id": {
+                    "type": "integer"
+                },
+                "supplier_id": {
+                    "type": "integer"
+                },
+                "supplier_name": {
                     "type": "string"
                 }
             }

@@ -482,6 +482,27 @@ definitions:
       supplier_type:
         type: string
     type: object
+  model.VSupplierInvoice:
+    properties:
+      invoice_due_date:
+        type: string
+      invoice_number:
+        type: string
+      invoice_start_date:
+        type: string
+      invoice_status:
+        type: string
+      invoice_title:
+        type: string
+      invoice_total:
+        type: number
+      invoices_id:
+        type: integer
+      supplier_id:
+        type: integer
+      supplier_name:
+        type: string
+    type: object
 info:
   contact: {}
   title: Test Accounting App
@@ -872,6 +893,68 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Register Invoice
+      tags:
+      - Invoice
+  /invoices:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: page requested (defaults to 0)
+        in: query
+        name: page
+        type: integer
+      - description: number of records in a page  (defaults to 20)
+        in: query
+        name: pagesize
+        type: integer
+      - description: asc / desc
+        in: query
+        name: order
+        type: string
+      - description: filter by invoice status
+        in: query
+        name: status
+        type: string
+      - description: filter by customer name
+        in: query
+        name: customer
+        type: string
+      - description: filter by invoice type
+        in: query
+        name: invoiceType
+        type: string
+      - description: search lower limit start date time
+        in: query
+        name: dateFrom
+        type: string
+      - description: search upper limit start date time
+        in: query
+        name: dateTo
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/entity.PagedResults'
+            - properties:
+                Data:
+                  items:
+                    $ref: '#/definitions/model.VSupplierInvoice'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: List All Invoices
       tags:
       - Invoice
   /item:
