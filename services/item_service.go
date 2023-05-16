@@ -15,6 +15,7 @@ type ItemService interface {
 	UpdateItem(itemId int32, updated *model.Item) (result *model.Item, RowsAffected int64, err error)
 	DeleteItem(itemId int32) (result *model.Item, RowsAffected int64, err error)
 	GetAllItemByItemName(itemName string) (result []model.Item, totalRows int64, err error)
+	WithTrx(*gorm.DB) *mysqlDBRepository
 }
 
 func NewItemService(mysqlConnection *gorm.DB) ItemService {

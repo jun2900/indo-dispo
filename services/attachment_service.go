@@ -8,6 +8,7 @@ import (
 
 type AttachmentService interface {
 	GetAttachmentByBillId(billId int32) (results []model.Attachment, totalRows int64, err error)
+	GetAttachmentByInvoiceId(invoiceId int32) (results []model.Attachment, totalRows int64, err error)
 	CreateAttachments(record []model.Attachment) (result []model.Attachment, RowsAffected int64, err error)
 	DeleteAttachmentByBillId(billId int32) (err error)
 	WithTrx(*gorm.DB) *mysqlDBRepository
@@ -30,6 +31,14 @@ func (r *mysqlDBRepository) CreateAttachments(record []model.Attachment) (result
 
 func (r *mysqlDBRepository) GetAttachmentByBillId(billId int32) (results []model.Attachment, totalRows int64, err error) {
 	if err = r.mysql.Model(&model.Attachment{}).Where("bill_id = ?", billId).Count(&totalRows).Find(&results).Error; err != nil {
+		return nil, -1, err
+	}
+
+	return results, totalRows, nil
+}
+
+func (r *mysqlDBRepository) GetAttachmentByInvoiceId(invoiceId int32) (results []model.Attachment, totalRows int64, err error) {
+	if err = r.mysql.Model(&model.Attachment{}).Where("invoice_id = ?", invoiceId).Count(&totalRows).Find(&results).Error; err != nil {
 		return nil, -1, err
 	}
 

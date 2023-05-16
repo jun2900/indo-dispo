@@ -895,6 +895,34 @@ paths:
       summary: Register Invoice
       tags:
       - Invoice
+  /invoice/{invoiceId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: invoice id
+        in: path
+        name: invoiceId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.BillDetailsResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Get Invoice Details
+      tags:
+      - Invoice
   /invoices:
     get:
       consumes:

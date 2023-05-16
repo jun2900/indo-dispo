@@ -105,6 +105,122 @@ func (i *InvoiceController) GetAllInvoices(c *fiber.Ctx) error {
 	})
 }
 
+// @Summary Get Invoice Details
+// @Tags Invoice
+// @Accept  json
+// @Produce  json
+// @Param  invoiceId path int true "invoice id"
+// @Success 200 {object} entity.BillDetailsResp
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /invoice/{invoiceId} [get]
+func (i *InvoiceController) GetInvoiceDetail(c *fiber.Ctx) error {
+	functionName := "GetInvoiceDetail"
+
+	invoiceId, err := c.ParamsInt("invoiceId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing invoice id, details = %v", err),
+		})
+	}
+
+	trxHandle := c.Locals("db_trx").(*gorm.DB)
+	invoice, _, err := i.invoiceService.WithTrx(trxHandle).GetInvoice(int32(invoiceId))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting invoice, details = %v", err),
+		})
+	}
+
+	var attachments []entity.Attachment
+	attachmentRec, _, err := i.attachmentService.WithTrx(trxHandle).GetAttachmentByInvoiceId(invoice.InvoicesID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on attachment by invoice id, details = %v", err),
+		})
+	}
+
+	if len(attachmentRec) > 0 {
+		for _, at := range attachmentRec {
+			attachments = append(attachments, entity.Attachment{
+				Name: at.AttachmentName,
+				File: at.AttachmentFile,
+			})
+		}
+	}
+
+	itemSells, _, err := i.itemSellService.WithTrx(trxHandle).GetAllItemSellsByInvoiceId(invoice.InvoicesID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on getting item purchases with invoice id %d details = %v", invoice.InvoicesID, err),
+		})
+	}
+
+	var itemInvoices []entity.ItemBill
+	for _, ip := range itemSells {
+		item, err := i.itemService.GetItem(ip.ItemID)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on getting item purchases with invoice id %d details = %v", invoice.InvoicesID, err),
+			})
+		}
+
+		//is, err := i.itemService.WithTrx(trxHandle).GetItemWithItemIdAndSupplierId(item.ItemID, invoice.SupplierID)
+		//if err != nil {
+		//	return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+		//		SourceFunction: functionName,
+		//		ErrMessage:     fmt.Sprintf("error on getting item supplier with supplier id '%d' and item id '%d' details = %v", invoice.SupplierID, item.ItemID, err),
+		//	})
+		//}
+
+		var amount float64
+		if ip.ItemSellDiscount != nil {
+			amount = item.ItemPurchasePrice*float64(ip.ItemSellQty) - item.ItemPurchasePrice*float64(ip.ItemSellQty)**ip.ItemSellDiscount/100
+		} else {
+			amount = item.ItemPurchasePrice * float64(ip.ItemSellQty)
+		}
+
+		itemPpn := false
+		if ip.ItemSellPpn == 1 {
+			itemPpn = true
+		}
+		itemInvoices = append(itemInvoices, entity.ItemBill{
+			Id:          item.ItemID,
+			Name:        item.ItemName,
+			Description: item.ItemDescription,
+			Qty:         ip.ItemSellQty,
+			Price:       item.ItemPurchasePrice,
+			Amount:      amount,
+			ItemPpn:     itemPpn,
+			ItemUnit:    ip.ItemSellUnit,
+		})
+	}
+
+	total := 0
+	subTotal := 0
+	for _, ib := range itemInvoices {
+		total += int(ib.Amount)
+		subTotal += int(ib.Qty) * int(ib.Price)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.InvoiceDetailResp{
+		StartDate:          invoice.InvoiceStartDate.Format(layoutTime),
+		DueDate:            invoice.InvoiceDueDate.Format(layoutTime),
+		InvoiceNumber:      invoice.InvoiceNumber,
+		InvoiceOrderNumber: invoice.InvoiceOrderNumber,
+		Attachments:        attachments,
+		Items:              itemInvoices,
+		InvoiceStatus:      invoice.InvoiceStatus,
+		InvoiceSubTotal:    int64(subTotal),
+		InvoiceTotal:       int64(total),
+	})
+}
+
 // @Summary Register Invoice
 // @Tags Invoice
 // @Accept  json
@@ -197,7 +313,7 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 		trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on creating bill, details = %v", err),
+			ErrMessage:     fmt.Sprintf("error on creating invoice, details = %v", err),
 		})
 	}
 

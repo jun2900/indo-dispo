@@ -119,6 +119,7 @@ func main() {
 
 	app.Get("/invoices", middleware.DBTransactionMiddleware(DB), invoiceController.GetAllInvoices)
 	app.Post("/invoice", middleware.DBTransactionMiddleware(DB), invoiceController.CreateInvoice)
+	app.Get("/invoice/:invoiceId", middleware.DBTransactionMiddleware(DB), invoiceController.GetInvoiceDetail)
 
 	app.Post("/admin/login", adminController.Login)
 

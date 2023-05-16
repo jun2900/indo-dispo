@@ -15,3 +15,15 @@ type AddInvoiceReq struct {
 	Title         *string        `json:"invoice_title"`
 	Subheading    *string        `json:"invoice_subheading"`
 }
+
+type InvoiceDetailResp struct {
+	StartDate          string       `json:"invoice_start_date"`
+	DueDate            string       `json:"invoice_due_date"`
+	InvoiceNumber      string       `json:"invoice_number"`
+	InvoiceOrderNumber *string      `json:"invoice_order_number"`
+	Attachments        []Attachment `json:"invoice_attachments"`
+	Items              []ItemBill   `json:"invoice_items"`
+	InvoiceStatus      string       `json:"invoice_status"`
+	InvoiceSubTotal    int64        `json:"invoice_subtotal"`
+	InvoiceTotal       int64        `json:"invoice_total"`
+}

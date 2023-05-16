@@ -14,6 +14,7 @@ type InvoiceService interface {
 		page, pagesize int,
 		order, status, customer string,
 		dateFrom, dateTo time.Time) (results []model.VSupplierInvoice, totalRows int64, err error)
+	GetInvoice(invoiceId int32) (result *model.Invoice, RowsAffected int64, err error)
 	WithTrx(*gorm.DB) *mysqlDBRepository
 }
 
@@ -71,4 +72,12 @@ func (r *mysqlDBRepository) GetAllInvoices(
 	}
 
 	return results, totalRows, nil
+}
+
+func (r *mysqlDBRepository) GetInvoice(invoiceId int32) (result *model.Invoice, RowsAffected int64, err error) {
+	db := r.mysql.First(&result, invoiceId)
+	if err = db.Error; err != nil {
+		return nil, -1, err
+	}
+	return result, db.RowsAffected, nil
 }
