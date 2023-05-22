@@ -640,6 +640,58 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/invoice/status/{invoiceId}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Update Invoice Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "invoice id",
+                        "name": "invoiceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "update invoice status request (paid/cancelled)",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.InvoiceUpdateStatusReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/invoice/{invoiceId}": {
             "get": {
                 "consumes": [
@@ -666,6 +718,99 @@ const docTemplate_swagger = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/entity.BillDetailsResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update Invoice more detail but not status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Update Invoice",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "invoice id",
+                        "name": "invoiceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "update invoice req",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateInvoiceReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete invoice that are not paid yet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Delete Invoice",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "invoice id",
+                        "name": "invoiceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.StatusResponse"
                         }
                     },
                     "400": {
@@ -1672,6 +1817,14 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "entity.InvoiceUpdateStatusReq": {
+            "type": "object",
+            "properties": {
+                "invoice_status": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.ItemBill": {
             "type": "object",
             "properties": {
@@ -1949,6 +2102,53 @@ const docTemplate_swagger = `{
                     "type": "number"
                 },
                 "bill_start_date": {
+                    "type": "string"
+                },
+                "supplier_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.UpdateInvoiceReq": {
+            "type": "object",
+            "properties": {
+                "invoice_account_number": {
+                    "type": "string"
+                },
+                "invoice_attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Attachment"
+                    }
+                },
+                "invoice_bank_name": {
+                    "type": "string"
+                },
+                "invoice_due_date": {
+                    "type": "string"
+                },
+                "invoice_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ItemPurchase"
+                    }
+                },
+                "invoice_logo": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "invoice_shipping_cost": {
+                    "type": "number"
+                },
+                "invoice_start_date": {
+                    "type": "string"
+                },
+                "invoice_subheading": {
+                    "type": "string"
+                },
+                "invoice_title": {
                     "type": "string"
                 },
                 "supplier_id": {

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -218,6 +219,9 @@ func (i *InvoiceController) GetInvoiceDetail(c *fiber.Ctx) error {
 		InvoiceStatus:      invoice.InvoiceStatus,
 		InvoiceSubTotal:    int64(subTotal),
 		InvoiceTotal:       int64(total),
+		Logo:               invoice.InvoiceLogo,
+		Title:              invoice.InvoiceTitle,
+		Subheading:         invoice.InvoiceSubheading,
 	})
 }
 
@@ -290,6 +294,8 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 		}
 	}
 
+	total += input.ShippingCost
+
 	randNum, _ := rand.Int(rand.Reader, big.NewInt(9000))
 	randNum = randNum.Add(randNum, big.NewInt(1000))
 
@@ -298,15 +304,18 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 	trxHandle := c.Locals("db_trx").(*gorm.DB)
 
 	invoice, _, err := i.invoiceService.WithTrx(trxHandle).CreateInvoice(&model.Invoice{
-		SupplierID:        input.CustomerId,
-		InvoiceStartDate:  startDateTime,
-		InvoiceDueDate:    dueDateTime,
-		InvoiceNumber:     invoiceNumber,
-		InvoiceTitle:      input.Title,
-		InvoiceSubheading: input.Subheading,
-		InvoiceLogo:       input.Logo,
-		InvoiceTotal:      total,
-		InvoiceStatus:     "MENUNGGU PEMBAYARAN",
+		SupplierID:           input.CustomerId,
+		InvoiceStartDate:     startDateTime,
+		InvoiceDueDate:       dueDateTime,
+		InvoiceNumber:        invoiceNumber,
+		InvoiceTitle:         input.Title,
+		InvoiceSubheading:    input.Subheading,
+		InvoiceLogo:          input.Logo,
+		InvoiceShippingCost:  input.ShippingCost,
+		InvoiceAccountNumber: input.AccountNumber,
+		InvoiceBankName:      input.BankName,
+		InvoiceTotal:         total,
+		InvoiceStatus:        "MENUNGGU PEMBAYARAN",
 	})
 	if err != nil {
 		log.Println("testt create invoice err")
@@ -364,7 +373,7 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 		trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on creating item purchases, details = %v", err),
+			ErrMessage:     fmt.Sprintf("error on creating item sell, details = %v", err),
 		})
 	}
 
@@ -387,9 +396,312 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 // @Produce  json
 // @Success 200 {object} entity.InvoiceHeaderResp
 // @Router /invoice/header [get]
-func (b *InvoiceController) GetInvoiceHeader(c *fiber.Ctx) error {
+func (i *InvoiceController) GetInvoiceHeader(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(entity.InvoiceHeaderResp{
-		Overdue: b.invoiceService.GetAllOverdueInvoiceTotal(),
-		Open:    b.invoiceService.GetAllMenungguPembayaranInvoiceTotal(),
+		Overdue: i.invoiceService.GetAllOverdueInvoiceTotal(),
+		Open:    i.invoiceService.GetAllMenungguPembayaranInvoiceTotal(),
 	})
+}
+
+// @Summary Update Invoice Status
+// @Tags Invoice
+// @Accept  json
+// @Produce  json
+// @Param  invoiceId path int true "invoice id"
+// @Param  input body entity.InvoiceUpdateStatusReq true "update invoice status request (paid/cancelled)"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /invoice/status/{invoiceId} [put]
+func (i *InvoiceController) UpdateInvoiceStatus(c *fiber.Ctx) error {
+	var input entity.InvoiceUpdateStatusReq
+
+	functionName := "UpdateInvoiceStatus"
+
+	invoiceId, err := c.ParamsInt("invoiceId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing invoice id, details = %v", err),
+		})
+	}
+
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing item input, details = %v", err),
+		})
+	}
+
+	if strings.ToLower(input.Status) != "paid" && strings.ToLower(input.Status) != "cancelled" {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "status must be paid or cancelled",
+		})
+	}
+
+	if strings.ToLower(input.Status) == "paid" {
+		_, _, err := i.invoiceService.UpdateInvoiceStatus(int32(invoiceId), "SUDAH DIBAYAR")
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on updating invoice status, details = %v", err),
+			})
+		}
+	} else {
+		_, _, err := i.invoiceService.UpdateInvoiceStatus(int32(invoiceId), strings.ToUpper(input.Status))
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on updating invoice status, details = %v", err),
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
+		Status: "success on updating invoice",
+	})
+}
+
+// @Summary Update Invoice
+// @Description Update Invoice more detail but not status
+// @Tags Invoice
+// @Accept  json
+// @Produce  json
+// @Param  invoiceId path int true "invoice id"
+// @Param  input body entity.UpdateInvoiceReq true "update invoice req"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /invoice/{invoiceId} [put]
+func (i *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
+	functionName := "UpdateInvoice"
+
+	var input entity.UpdateInvoiceReq
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing item input, details = %v", err),
+		})
+	}
+
+	invoiceId, err := c.ParamsInt("invoiceId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing invoice id, details = %v", err),
+		})
+	}
+
+	trxHandle := c.Locals("db_trx").(*gorm.DB)
+
+	invoice, err := i.deleteInvoiceRelatedThings(trxHandle, int32(invoiceId))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     err.Error(),
+		})
+	}
+
+	startDateTime, dueDateTime, total, err := i.validateInvoiceData(struct {
+		StartDate  string
+		DueDate    string
+		Items      []entity.ItemPurchase
+		SupplierId int32
+	}{
+		StartDate:  input.StartDate,
+		DueDate:    input.DueDate,
+		Items:      input.Items,
+		SupplierId: input.SupplierId,
+	})
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     err.Error(),
+		})
+	}
+
+	total += input.ShippingCost
+
+	_, _, err = i.invoiceService.UpdateInvoice(invoice.InvoicesID, &model.Invoice{
+		SupplierID:           input.SupplierId,
+		InvoiceStartDate:     startDateTime,
+		InvoiceDueDate:       dueDateTime,
+		InvoiceTitle:         input.Title,
+		InvoiceSubheading:    input.Subheading,
+		InvoiceLogo:          input.Logo,
+		InvoiceShippingCost:  input.ShippingCost,
+		InvoiceAccountNumber: input.AccountNumber,
+		InvoiceBankName:      input.BankName,
+		InvoiceTotal:         total,
+	})
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on creating invoice, details = %v", err),
+		})
+	}
+
+	var modelAttachments []model.Attachment
+
+	if len(input.Attachments) > 0 {
+		for _, at := range input.Attachments {
+			modelAttachments = append(modelAttachments, model.Attachment{
+				BillID:         nil,
+				InvoiceID:      &invoice.InvoicesID,
+				AttachmentName: at.Name,
+				AttachmentFile: at.File,
+			})
+		}
+
+		_, _, err = i.attachmentService.CreateAttachments(modelAttachments)
+		if err != nil {
+			trxHandle.Rollback()
+			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+				SourceFunction: functionName,
+				ErrMessage:     fmt.Sprintf("error on creating attachments, details = %v", err),
+			})
+		}
+	}
+
+	var modelItemSells []model.ItemSell
+	for _, item := range input.Items {
+		itPurchasePpn := 0
+		if item.ItemPpn {
+			itPurchasePpn = 1
+		}
+
+		modelItemSells = append(modelItemSells, model.ItemSell{
+			ItemID:           item.ItemId,
+			InvoiceID:        invoice.InvoicesID,
+			ItemSellQty:      item.ItemQty,
+			ItemSellTime:     time.Now(),
+			ItemSellDiscount: item.ItemDiscount,
+			ItemSellPpn:      int32(itPurchasePpn),
+			ItemSellUnit:     item.ItemUnit,
+		})
+	}
+	_, _, err = i.itemSellService.CreateItemSell(modelItemSells)
+	if err != nil {
+		trxHandle.Rollback()
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on creating item sells, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(entity.StatusResponse{
+		Status: "successfully updated invoice",
+	})
+
+}
+
+// @Summary Delete Invoice
+// @Description delete invoice that are not paid yet
+// @Tags Invoice
+// @Accept  json
+// @Produce  json
+// @Param  invoiceId path int true "invoice id"
+// @Success 200 {object} entity.StatusResponse
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /invoice/{invoiceId} [delete]
+func (i *InvoiceController) DeleteInvoice(c *fiber.Ctx) error {
+	functionName := "DeleteInvoice"
+
+	invoiceId, err := c.ParamsInt("invoiceId")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on parsing invoice id, details = %v", err),
+		})
+	}
+
+	trxHandle := c.Locals("db_trx").(*gorm.DB)
+	invoice, err := i.deleteInvoiceRelatedThings(trxHandle, int32(invoiceId))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     err.Error(),
+		})
+	}
+
+	if err := i.invoiceService.DeleteInvoice(invoice.InvoicesID); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("error on deleting invoice, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
+		Status: "success on deleting invoice",
+	})
+}
+
+func (i *InvoiceController) validateInvoiceData(input struct {
+	StartDate  string
+	DueDate    string
+	Items      []entity.ItemPurchase
+	SupplierId int32
+}) (startDateTime time.Time, dueDateTime time.Time, total float64, err error) {
+	startDateTime, err = time.Parse(layoutTime, input.StartDate)
+	if err != nil {
+		return time.Time{}, time.Time{}, -1, fmt.Errorf("error on parsing start date, details = %v", err)
+	}
+
+	dueDateTime, err = time.Parse(layoutTime, input.DueDate)
+	if err != nil {
+		return time.Time{}, time.Time{}, -1, fmt.Errorf("error on parsing due date, details = %v", err)
+	}
+
+	if len(input.Items) < 1 {
+		return time.Time{}, time.Time{}, -1, errors.New("items cannot be empty")
+	}
+
+	supplier, _, err := i.supplierService.GetSupplier(input.SupplierId)
+	if err != nil {
+		return time.Time{}, time.Time{}, -1, fmt.Errorf("error on getting supplier details = %v", err)
+	}
+
+	if strings.ToLower(supplier.SupplierType) != "customer" {
+		return time.Time{}, time.Time{}, -1, errors.New("supplier is not a vendor")
+	}
+
+	total = 0
+	for _, item := range input.Items {
+		it, err := i.itemService.GetItem(item.ItemId)
+		if err != nil {
+			return time.Time{}, time.Time{}, -1, fmt.Errorf("error on getting item with item id '%d' details = %v", item.ItemId, err)
+		}
+		total += it.ItemSellPrice*float64(item.ItemQty) - it.ItemSellPrice*float64(item.ItemQty)**item.ItemDiscount/100
+		if item.ItemPpn {
+			total += total * 11 / 100
+		}
+	}
+
+	return startDateTime, dueDateTime, total, nil
+}
+
+func (i *InvoiceController) deleteInvoiceRelatedThings(trxHandle *gorm.DB, invoiceId int32) (invoice *model.Invoice, err error) {
+	invoice, _, err = i.invoiceService.GetInvoice(invoiceId)
+	if err != nil {
+		return nil, fmt.Errorf("error on getting invoice, details = %v", err)
+	}
+
+	if strings.ToLower(invoice.InvoiceStatus) == "sudah dibayar" {
+		return nil, errors.New("invoice already been paid")
+	}
+
+	if err := i.itemSellService.DeleteItemSellsByInvoiceId(invoice.InvoicesID); err != nil {
+		trxHandle.Rollback()
+		return nil, fmt.Errorf("error on deleting item purchases by invoice id, details = %v", err)
+	}
+
+	if err := i.attachmentService.DeleteAttachmentByInvoiceId(invoice.InvoicesID); err != nil {
+		trxHandle.Rollback()
+		return nil, fmt.Errorf("error on deleting item purchases by invoice id, details = %v", err)
+	}
+
+	return invoice, nil
 }

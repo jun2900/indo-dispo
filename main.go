@@ -120,7 +120,10 @@ func main() {
 	app.Get("/invoices", middleware.DBTransactionMiddleware(DB), invoiceController.GetAllInvoices)
 	app.Post("/invoice", middleware.DBTransactionMiddleware(DB), invoiceController.CreateInvoice)
 	app.Get("/invoice/header", invoiceController.GetInvoiceHeader)
+	app.Put("/invoice/status/:invoiceId", invoiceController.UpdateInvoiceStatus)
 	app.Get("/invoice/:invoiceId", middleware.DBTransactionMiddleware(DB), invoiceController.GetInvoiceDetail)
+	app.Put("/invoice/:invoiceId", middleware.DBTransactionMiddleware(DB), invoiceController.UpdateInvoice)
+	app.Delete("/invoice/:invoiceId", middleware.DBTransactionMiddleware(DB), invoiceController.DeleteInvoice)
 
 	app.Post("/admin/login", adminController.Login)
 

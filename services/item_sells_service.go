@@ -8,6 +8,7 @@ import (
 type ItemSellService interface {
 	CreateItemSell(record []model.ItemSell) (results []model.ItemSell, RowsAffected int64, err error)
 	GetAllItemSellsByInvoiceId(invoiceId int32) (results []model.ItemSell, totalRows int64, err error)
+	DeleteItemSellsByInvoiceId(invoiceId int32) (err error)
 	WithTrx(*gorm.DB) *mysqlDBRepository
 }
 
@@ -31,4 +32,11 @@ func (r *mysqlDBRepository) GetAllItemSellsByInvoiceId(invoiceId int32) (results
 	}
 
 	return results, totalRows, nil
+}
+
+func (r *mysqlDBRepository) DeleteItemSellsByInvoiceId(invoiceId int32) (err error) {
+	if err := r.mysql.Where("item_sell_id = ?", invoiceId).Delete(&model.ItemSell{}).Error; err != nil {
+		return err
+	}
+	return nil
 }

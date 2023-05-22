@@ -144,6 +144,8 @@ func (b *BillController) CreateBill(c *fiber.Ctx) error {
 		})
 	}
 
+	total += input.ShippingCost
+
 	randNum, _ := rand.Int(rand.Reader, big.NewInt(9000))
 	randNum = randNum.Add(randNum, big.NewInt(1000))
 
@@ -472,6 +474,8 @@ func (b *BillController) UpdateBill(c *fiber.Ctx) error {
 			ErrMessage:     err.Error(),
 		})
 	}
+
+	total += input.ShippingCost
 
 	_, _, err = b.billService.UpdateBill(bill.BillID, &model.Bill{
 		SupplierID:        input.SupplierId,

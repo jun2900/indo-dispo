@@ -15,8 +15,11 @@ type InvoiceService interface {
 		order, status, customer string,
 		dateFrom, dateTo time.Time) (results []model.VSupplierInvoice, totalRows int64, err error)
 	GetInvoice(invoiceId int32) (result *model.Invoice, RowsAffected int64, err error)
+	UpdateInvoice(itemId int32, updated *model.Invoice) (result *model.Invoice, RowsAffected int64, err error)
 	GetAllMenungguPembayaranInvoiceTotal() (invoiceTotal float64)
 	GetAllOverdueInvoiceTotal() (invoiceTotal float64)
+	UpdateInvoiceStatus(invoiceId int32, invoiceStatus string) (result *model.Invoice, RowsAffected int64, err error)
+	DeleteInvoice(invoiceId int32) (err error)
 	WithTrx(*gorm.DB) *mysqlDBRepository
 }
 
@@ -93,4 +96,46 @@ func (r *mysqlDBRepository) GetAllOverdueInvoiceTotal() (invoiceTotal float64) {
 	now := time.Now()
 	r.mysql.Model(&model.Invoice{}).Where("invoice_due_date < ?", now).Not("invoice_status IN ?", []string{"SUDAH DIBAYAR", "CANCELLED"}).Select("sum(invoice_total)").Row().Scan(&invoiceTotal)
 	return invoiceTotal
+}
+
+func (r *mysqlDBRepository) UpdateInvoiceStatus(invoiceId int32, invoiceStatus string) (result *model.Invoice, RowsAffected int64, err error) {
+	result = &model.Invoice{}
+	db := r.mysql.First(&result, invoiceId)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrNotFound
+	}
+
+	result.InvoiceStatus = invoiceStatus
+
+	if err := db.Save(&result).Error; err != nil {
+		return nil, -1, err
+	}
+
+	return result, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) UpdateInvoice(itemId int32, updated *model.Invoice) (result *model.Invoice, RowsAffected int64, err error) {
+	result = &model.Invoice{}
+	db := r.mysql.First(result, itemId)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrNotFound
+	}
+
+	if err = Copy(result, updated); err != nil {
+		return nil, -1, ErrUpdateFailed
+	}
+
+	db = db.Save(result)
+	if err = db.Error; err != nil {
+		return nil, -1, ErrUpdateFailed
+	}
+
+	return result, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) DeleteInvoice(invoiceId int32) (err error) {
+	if err := r.mysql.Delete(&model.Invoice{}, invoiceId).Error; err != nil {
+		return err
+	}
+	return nil
 }

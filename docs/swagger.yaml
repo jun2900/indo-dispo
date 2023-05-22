@@ -182,6 +182,11 @@ definitions:
       invoice_overdue:
         type: number
     type: object
+  entity.InvoiceUpdateStatusReq:
+    properties:
+      invoice_status:
+        type: string
+    type: object
   entity.ItemBill:
     properties:
       item_amount:
@@ -363,6 +368,37 @@ definitions:
       bill_shipping_cost:
         type: number
       bill_start_date:
+        type: string
+      supplier_id:
+        type: integer
+    type: object
+  entity.UpdateInvoiceReq:
+    properties:
+      invoice_account_number:
+        type: string
+      invoice_attachments:
+        items:
+          $ref: '#/definitions/entity.Attachment'
+        type: array
+      invoice_bank_name:
+        type: string
+      invoice_due_date:
+        type: string
+      invoice_items:
+        items:
+          $ref: '#/definitions/entity.ItemPurchase'
+        type: array
+      invoice_logo:
+        items:
+          type: integer
+        type: array
+      invoice_shipping_cost:
+        type: number
+      invoice_start_date:
+        type: string
+      invoice_subheading:
+        type: string
+      invoice_title:
         type: string
       supplier_id:
         type: integer
@@ -901,6 +937,34 @@ paths:
       tags:
       - Invoice
   /invoice/{invoiceId}:
+    delete:
+      consumes:
+      - application/json
+      description: delete invoice that are not paid yet
+      parameters:
+      - description: invoice id
+        in: path
+        name: invoiceId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Delete Invoice
+      tags:
+      - Invoice
     get:
       consumes:
       - application/json
@@ -928,6 +992,40 @@ paths:
       summary: Get Invoice Details
       tags:
       - Invoice
+    put:
+      consumes:
+      - application/json
+      description: Update Invoice more detail but not status
+      parameters:
+      - description: invoice id
+        in: path
+        name: invoiceId
+        required: true
+        type: integer
+      - description: update invoice req
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateInvoiceReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Update Invoice
+      tags:
+      - Invoice
   /invoice/header:
     get:
       consumes:
@@ -941,6 +1039,40 @@ paths:
           schema:
             $ref: '#/definitions/entity.InvoiceHeaderResp'
       summary: Get Invoice Header
+      tags:
+      - Invoice
+  /invoice/status/{invoiceId}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: invoice id
+        in: path
+        name: invoiceId
+        required: true
+        type: integer
+      - description: update invoice status request (paid/cancelled)
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.InvoiceUpdateStatusReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/entity.ErrRespController'
+      summary: Update Invoice Status
       tags:
       - Invoice
   /invoices:
