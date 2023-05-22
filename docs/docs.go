@@ -617,6 +617,29 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/invoice/header": {
+            "get": {
+                "description": "get invoice overdue open and draft stats",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Invoice"
+                ],
+                "summary": "Get Invoice Header",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entity.InvoiceHeaderResp"
+                        }
+                    }
+                }
+            }
+        },
         "/invoice/{invoiceId}": {
             "get": {
                 "consumes": [
@@ -1457,9 +1480,6 @@ const docTemplate_swagger = `{
                 },
                 "invoice_title": {
                     "type": "string"
-                },
-                "invoice_type": {
-                    "type": "string"
                 }
             }
         },
@@ -1637,6 +1657,17 @@ const docTemplate_swagger = `{
             "type": "object",
             "properties": {
                 "net_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "entity.InvoiceHeaderResp": {
+            "type": "object",
+            "properties": {
+                "invoice_open": {
+                    "type": "number"
+                },
+                "invoice_overdue": {
                     "type": "number"
                 }
             }

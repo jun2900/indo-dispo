@@ -58,8 +58,6 @@ definitions:
         type: string
       invoice_title:
         type: string
-      invoice_type:
-        type: string
     type: object
   entity.AddItemReq:
     properties:
@@ -175,6 +173,13 @@ definitions:
   entity.GetBalanceAmountResp:
     properties:
       net_amount:
+        type: number
+    type: object
+  entity.InvoiceHeaderResp:
+    properties:
+      invoice_open:
+        type: number
+      invoice_overdue:
         type: number
     type: object
   entity.ItemBill:
@@ -921,6 +926,21 @@ paths:
           schema:
             $ref: '#/definitions/entity.ErrRespController'
       summary: Get Invoice Details
+      tags:
+      - Invoice
+  /invoice/header:
+    get:
+      consumes:
+      - application/json
+      description: get invoice overdue open and draft stats
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.InvoiceHeaderResp'
+      summary: Get Invoice Header
       tags:
       - Invoice
   /invoices:

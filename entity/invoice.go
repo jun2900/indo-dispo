@@ -4,7 +4,6 @@ type AddInvoiceReq struct {
 	CustomerId    int32          `json:"customer_id"`
 	StartDate     string         `json:"invoice_start_date"`
 	DueDate       string         `json:"invoice_due_date"`
-	BillType      string         `json:"invoice_type"`
 	Attachments   []Attachment   `json:"invoice_attachments"`
 	Items         []ItemPurchase `json:"invoice_items"`
 	BankName      *string        `json:"invoice_bank_name"`
@@ -26,4 +25,9 @@ type InvoiceDetailResp struct {
 	InvoiceStatus      string       `json:"invoice_status"`
 	InvoiceSubTotal    int64        `json:"invoice_subtotal"`
 	InvoiceTotal       int64        `json:"invoice_total"`
+}
+
+type InvoiceHeaderResp struct {
+	Overdue float64 `json:"invoice_overdue"`
+	Open    float64 `json:"invoice_open"`
 }

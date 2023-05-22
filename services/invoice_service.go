@@ -15,6 +15,8 @@ type InvoiceService interface {
 		order, status, customer string,
 		dateFrom, dateTo time.Time) (results []model.VSupplierInvoice, totalRows int64, err error)
 	GetInvoice(invoiceId int32) (result *model.Invoice, RowsAffected int64, err error)
+	GetAllMenungguPembayaranInvoiceTotal() (invoiceTotal float64)
+	GetAllOverdueInvoiceTotal() (invoiceTotal float64)
 	WithTrx(*gorm.DB) *mysqlDBRepository
 }
 
@@ -80,4 +82,15 @@ func (r *mysqlDBRepository) GetInvoice(invoiceId int32) (result *model.Invoice, 
 		return nil, -1, err
 	}
 	return result, db.RowsAffected, nil
+}
+
+func (r *mysqlDBRepository) GetAllMenungguPembayaranInvoiceTotal() (invoiceTotal float64) {
+	now := time.Now()
+	r.mysql.Model(&model.Invoice{}).Where("invoice_status = ? AND invoice_due_date >= ?", "MENUNGGU PEMBAYARAN", now).Select("sum(invoice_total)").Row().Scan(&invoiceTotal)
+	return invoiceTotal
+}
+func (r *mysqlDBRepository) GetAllOverdueInvoiceTotal() (invoiceTotal float64) {
+	now := time.Now()
+	r.mysql.Model(&model.Invoice{}).Where("invoice_due_date < ?", now).Not("invoice_status IN ?", []string{"SUDAH DIBAYAR", "CANCELLED"}).Select("sum(invoice_total)").Row().Scan(&invoiceTotal)
+	return invoiceTotal
 }

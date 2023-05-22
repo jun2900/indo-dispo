@@ -379,3 +379,17 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 		Status: "successfully created invoices",
 	})
 }
+
+// @Summary Get Invoice Header
+// @Description get invoice overdue open and draft stats
+// @Tags Invoice
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} entity.InvoiceHeaderResp
+// @Router /invoice/header [get]
+func (b *InvoiceController) GetInvoiceHeader(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusOK).JSON(entity.InvoiceHeaderResp{
+		Overdue: b.invoiceService.GetAllOverdueInvoiceTotal(),
+		Open:    b.invoiceService.GetAllMenungguPembayaranInvoiceTotal(),
+	})
+}
