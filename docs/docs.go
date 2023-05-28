@@ -2112,6 +2112,9 @@ const docTemplate_swagger = `{
         "entity.UpdateInvoiceReq": {
             "type": "object",
             "properties": {
+                "customer_id": {
+                    "type": "integer"
+                },
                 "invoice_account_number": {
                     "type": "string"
                 },
@@ -2150,9 +2153,6 @@ const docTemplate_swagger = `{
                 },
                 "invoice_title": {
                     "type": "string"
-                },
-                "supplier_id": {
-                    "type": "integer"
                 }
             }
         },

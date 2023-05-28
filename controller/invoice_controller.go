@@ -222,6 +222,9 @@ func (i *InvoiceController) GetInvoiceDetail(c *fiber.Ctx) error {
 		Logo:               invoice.InvoiceLogo,
 		Title:              invoice.InvoiceTitle,
 		Subheading:         invoice.InvoiceSubheading,
+		ShippingCost:       invoice.InvoiceShippingCost,
+		BankName:           invoice.InvoiceBankName,
+		Notes:              invoice.InvoiceNotes,
 	})
 }
 

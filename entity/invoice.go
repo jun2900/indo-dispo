@@ -28,6 +28,9 @@ type InvoiceDetailResp struct {
 	Logo               *[]byte      `json:"invoice_logo"`
 	Title              *string      `json:"invoice_title"`
 	Subheading         *string      `json:"invoice_subheading"`
+	ShippingCost       float64      `json:"invoice_shipping_cost"`
+	BankName           *string      `json:"invoice_bank_name"`
+	Notes              *string      `json:"invoice_notes"`
 }
 
 type InvoiceHeaderResp struct {
