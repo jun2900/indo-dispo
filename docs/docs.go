@@ -2142,6 +2142,9 @@ const docTemplate_swagger = `{
                         "type": "integer"
                     }
                 },
+                "invoice_notes": {
+                    "type": "string"
+                },
                 "invoice_shipping_cost": {
                     "type": "number"
                 },

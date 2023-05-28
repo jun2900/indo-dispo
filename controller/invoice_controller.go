@@ -311,6 +311,7 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 		InvoiceStartDate:     startDateTime,
 		InvoiceDueDate:       dueDateTime,
 		InvoiceNumber:        invoiceNumber,
+		InvoiceOrderNumber:   new(string),
 		InvoiceTitle:         input.Title,
 		InvoiceSubheading:    input.Subheading,
 		InvoiceLogo:          input.Logo,
@@ -319,6 +320,7 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 		InvoiceBankName:      input.BankName,
 		InvoiceTotal:         total,
 		InvoiceStatus:        "MENUNGGU PEMBAYARAN",
+		InvoiceNotes:         input.Notes,
 	})
 	if err != nil {
 		log.Println("testt create invoice err")
@@ -537,6 +539,7 @@ func (i *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 		InvoiceAccountNumber: input.AccountNumber,
 		InvoiceBankName:      input.BankName,
 		InvoiceTotal:         total,
+		InvoiceNotes:         input.Notes,
 	})
 
 	if err != nil {

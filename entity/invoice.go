@@ -54,4 +54,5 @@ type UpdateInvoiceReq struct {
 	Logo          *[]byte        `json:"invoice_logo"`
 	Title         *string        `json:"invoice_title"`
 	Subheading    *string        `json:"invoice_subheading"`
+	Notes         *string        `json:"invoice_notes"`
 }

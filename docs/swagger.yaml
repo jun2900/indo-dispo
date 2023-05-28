@@ -394,6 +394,8 @@ definitions:
         items:
           type: integer
         type: array
+      invoice_notes:
+        type: string
       invoice_shipping_cost:
         type: number
       invoice_start_date:
