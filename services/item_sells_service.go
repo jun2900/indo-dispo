@@ -35,7 +35,7 @@ func (r *mysqlDBRepository) GetAllItemSellsByInvoiceId(invoiceId int32) (results
 }
 
 func (r *mysqlDBRepository) DeleteItemSellsByInvoiceId(invoiceId int32) (err error) {
-	if err := r.mysql.Where("item_sell_id = ?", invoiceId).Delete(&model.ItemSell{}).Error; err != nil {
+	if err := r.mysql.Where("invoice_id = ?", invoiceId).Delete(&model.ItemSell{}).Error; err != nil {
 		return err
 	}
 	return nil

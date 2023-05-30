@@ -13,7 +13,6 @@ import (
 	"github.com/jun2900/indo-dispo/entity"
 	"github.com/jun2900/indo-dispo/model"
 	"github.com/jun2900/indo-dispo/services"
-	"gorm.io/gorm"
 )
 
 type InvoiceController struct {
@@ -88,9 +87,7 @@ func (i *InvoiceController) GetAllInvoices(c *fiber.Ctx) error {
 		}
 	}
 
-	trxHandle := c.Locals("db_trx").(*gorm.DB)
-
-	bills, totalRows, err := i.invoiceService.WithTrx(trxHandle).GetAllInvoices(page, pagesize, order, status, customer, dateFromTime, dateToTime)
+	bills, totalRows, err := i.invoiceService.GetAllInvoices(page, pagesize, order, status, customer, dateFromTime, dateToTime)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
@@ -126,9 +123,9 @@ func (i *InvoiceController) GetInvoiceDetail(c *fiber.Ctx) error {
 		})
 	}
 
-	trxHandle := c.Locals("db_trx").(*gorm.DB)
-	invoice, _, err := i.invoiceService.WithTrx(trxHandle).GetInvoice(int32(invoiceId))
+	invoice, _, err := i.invoiceService.GetInvoice(int32(invoiceId))
 	if err != nil {
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     fmt.Sprintf("error on getting invoice, details = %v", err),
@@ -136,11 +133,12 @@ func (i *InvoiceController) GetInvoiceDetail(c *fiber.Ctx) error {
 	}
 
 	var attachments []entity.Attachment
-	attachmentRec, _, err := i.attachmentService.WithTrx(trxHandle).GetAttachmentByInvoiceId(invoice.InvoicesID)
+	attachmentRec, _, err := i.attachmentService.GetAttachmentByInvoiceId(invoice.InvoicesID)
 	if err != nil {
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
-			ErrMessage:     fmt.Sprintf("error on attachment by invoice id, details = %v", err),
+			ErrMessage:     fmt.Sprintf("error on getting attachment by invoice id, details = %v", err),
 		})
 	}
 
@@ -153,8 +151,9 @@ func (i *InvoiceController) GetInvoiceDetail(c *fiber.Ctx) error {
 		}
 	}
 
-	itemSells, _, err := i.itemSellService.WithTrx(trxHandle).GetAllItemSellsByInvoiceId(invoice.InvoicesID)
+	itemSells, _, err := i.itemSellService.GetAllItemSellsByInvoiceId(invoice.InvoicesID)
 	if err != nil {
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     fmt.Sprintf("error on getting item purchases with invoice id %d details = %v", invoice.InvoicesID, err),
@@ -165,13 +164,14 @@ func (i *InvoiceController) GetInvoiceDetail(c *fiber.Ctx) error {
 	for _, ip := range itemSells {
 		item, err := i.itemService.GetItem(ip.ItemID)
 		if err != nil {
+			//trxHandle.Rollback()
 			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 				SourceFunction: functionName,
 				ErrMessage:     fmt.Sprintf("error on getting item purchases with invoice id %d details = %v", invoice.InvoicesID, err),
 			})
 		}
 
-		//is, err := i.itemService.WithTrx(trxHandle).GetItemWithItemIdAndSupplierId(item.ItemID, invoice.SupplierID)
+		//is, err := i.itemService.GetItemWithItemIdAndSupplierId(item.ItemID, invoice.SupplierID)
 		//if err != nil {
 		//	return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 		//		SourceFunction: functionName,
@@ -304,9 +304,7 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 
 	invoiceNumber := fmt.Sprintf("IDS/%s/%d", strings.ReplaceAll(time.Now().Format("2006-01-02"), "-", ""), randNum)
 
-	trxHandle := c.Locals("db_trx").(*gorm.DB)
-
-	invoice, _, err := i.invoiceService.WithTrx(trxHandle).CreateInvoice(&model.Invoice{
+	invoice, _, err := i.invoiceService.CreateInvoice(&model.Invoice{
 		SupplierID:           input.CustomerId,
 		InvoiceStartDate:     startDateTime,
 		InvoiceDueDate:       dueDateTime,
@@ -324,7 +322,7 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 	})
 	if err != nil {
 		log.Println("testt create invoice err")
-		trxHandle.Rollback()
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     fmt.Sprintf("error on creating invoice, details = %v", err),
@@ -343,10 +341,10 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 			})
 		}
 
-		_, _, err = i.attachmentService.WithTrx(trxHandle).CreateAttachments(modelAttachments)
+		_, _, err = i.attachmentService.CreateAttachments(modelAttachments)
 		if err != nil {
 			log.Println("testt create attachment err")
-			trxHandle.Rollback()
+			//trxHandle.Rollback()
 			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 				SourceFunction: functionName,
 				ErrMessage:     fmt.Sprintf("error on creating attachments, details = %v", err),
@@ -372,10 +370,10 @@ func (i *InvoiceController) CreateInvoice(c *fiber.Ctx) error {
 		})
 	}
 
-	_, _, err = i.itemSellService.WithTrx(trxHandle).CreateItemSell(modelItemSells)
+	_, _, err = i.itemSellService.CreateItemSell(modelItemSells)
 	if err != nil {
 		log.Println("testt create item sell err")
-		trxHandle.Rollback()
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     fmt.Sprintf("error on creating item sell, details = %v", err),
@@ -498,9 +496,7 @@ func (i *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 		})
 	}
 
-	trxHandle := c.Locals("db_trx").(*gorm.DB)
-
-	invoice, err := i.deleteInvoiceRelatedThings(trxHandle, int32(invoiceId))
+	invoice, err := i.deleteInvoiceRelatedThings(int32(invoiceId))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
@@ -520,6 +516,7 @@ func (i *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 		SupplierId: input.SupplierId,
 	})
 	if err != nil {
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     err.Error(),
@@ -543,6 +540,7 @@ func (i *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     fmt.Sprintf("error on creating invoice, details = %v", err),
@@ -563,7 +561,7 @@ func (i *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 
 		_, _, err = i.attachmentService.CreateAttachments(modelAttachments)
 		if err != nil {
-			trxHandle.Rollback()
+			//trxHandle.Rollback()
 			return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 				SourceFunction: functionName,
 				ErrMessage:     fmt.Sprintf("error on creating attachments, details = %v", err),
@@ -590,7 +588,7 @@ func (i *InvoiceController) UpdateInvoice(c *fiber.Ctx) error {
 	}
 	_, _, err = i.itemSellService.CreateItemSell(modelItemSells)
 	if err != nil {
-		trxHandle.Rollback()
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     fmt.Sprintf("error on creating item sells, details = %v", err),
@@ -624,8 +622,7 @@ func (i *InvoiceController) DeleteInvoice(c *fiber.Ctx) error {
 		})
 	}
 
-	trxHandle := c.Locals("db_trx").(*gorm.DB)
-	invoice, err := i.deleteInvoiceRelatedThings(trxHandle, int32(invoiceId))
+	invoice, err := i.deleteInvoiceRelatedThings(int32(invoiceId))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
@@ -634,6 +631,7 @@ func (i *InvoiceController) DeleteInvoice(c *fiber.Ctx) error {
 	}
 
 	if err := i.invoiceService.DeleteInvoice(invoice.InvoicesID); err != nil {
+		//trxHandle.Rollback()
 		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
 			SourceFunction: functionName,
 			ErrMessage:     fmt.Sprintf("error on deleting invoice, details = %v", err),
@@ -689,9 +687,10 @@ func (i *InvoiceController) validateInvoiceData(input struct {
 	return startDateTime, dueDateTime, total, nil
 }
 
-func (i *InvoiceController) deleteInvoiceRelatedThings(trxHandle *gorm.DB, invoiceId int32) (invoice *model.Invoice, err error) {
+func (i *InvoiceController) deleteInvoiceRelatedThings(invoiceId int32) (invoice *model.Invoice, err error) {
 	invoice, _, err = i.invoiceService.GetInvoice(invoiceId)
 	if err != nil {
+		//trxHandle.Rollback()
 		return nil, fmt.Errorf("error on getting invoice, details = %v", err)
 	}
 
@@ -700,12 +699,12 @@ func (i *InvoiceController) deleteInvoiceRelatedThings(trxHandle *gorm.DB, invoi
 	}
 
 	if err := i.itemSellService.DeleteItemSellsByInvoiceId(invoice.InvoicesID); err != nil {
-		trxHandle.Rollback()
+		//trxHandle.Rollback()
 		return nil, fmt.Errorf("error on deleting item purchases by invoice id, details = %v", err)
 	}
 
 	if err := i.attachmentService.DeleteAttachmentByInvoiceId(invoice.InvoicesID); err != nil {
-		trxHandle.Rollback()
+		//trxHandle.Rollback()
 		return nil, fmt.Errorf("error on deleting item purchases by invoice id, details = %v", err)
 	}
 
