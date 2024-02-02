@@ -10,9 +10,9 @@ import (
 
 const TableNameVSupplierInvoice = "v_supplier_invoice"
 
-// VSupplierInvoice mapped from table <v_supplier_invoice>
+// VSupplierInvoice VIEW
 type VSupplierInvoice struct {
-	InvoicesID       int32     `gorm:"column:invoices_id;not null;default:0" json:"invoices_id"`
+	InvoicesID       int32     `gorm:"column:invoices_id;not null" json:"invoices_id"`
 	SupplierID       int32     `gorm:"column:supplier_id;not null" json:"supplier_id"`
 	InvoiceStartDate time.Time `gorm:"column:invoice_start_date;not null" json:"invoice_start_date"`
 	InvoiceDueDate   time.Time `gorm:"column:invoice_due_date;not null" json:"invoice_due_date"`

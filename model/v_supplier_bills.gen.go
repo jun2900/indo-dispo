@@ -10,9 +10,9 @@ import (
 
 const TableNameVSupplierBill = "v_supplier_bills"
 
-// VSupplierBill mapped from table <v_supplier_bills>
+// VSupplierBill VIEW
 type VSupplierBill struct {
-	BillID          int32     `gorm:"column:bill_id;not null;default:0" json:"bill_id"`
+	BillID          int32     `gorm:"column:bill_id;not null" json:"bill_id"`
 	SupplierID      int32     `gorm:"column:supplier_id;not null" json:"supplier_id"`
 	BillStartDate   time.Time `gorm:"column:bill_start_date;not null" json:"bill_start_date"`
 	BillDueDate     time.Time `gorm:"column:bill_due_date;not null" json:"bill_due_date"`

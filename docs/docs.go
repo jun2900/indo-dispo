@@ -972,6 +972,49 @@ const docTemplate_swagger = `{
                 }
             }
         },
+        "/item/{itemCode}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Item"
+                ],
+                "summary": "Get Item by Item Code",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "item code",
+                        "name": "itemCode",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Item"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ErrRespController"
+                        }
+                    }
+                }
+            }
+        },
         "/item/{itemId}": {
             "put": {
                 "consumes": [
@@ -1631,6 +1674,9 @@ const docTemplate_swagger = `{
         "entity.AddItemReq": {
             "type": "object",
             "properties": {
+                "item_code": {
+                    "type": "string"
+                },
                 "item_description": {
                     "type": "string"
                 },
@@ -1877,6 +1923,9 @@ const docTemplate_swagger = `{
         "entity.ListItemBySupplierResp": {
             "type": "object",
             "properties": {
+                "item_code": {
+                    "type": "string"
+                },
                 "item_description": {
                     "type": "string"
                 },
@@ -2216,6 +2265,35 @@ const docTemplate_swagger = `{
                 },
                 "balance_log_time_added": {
                     "type": "string"
+                }
+            }
+        },
+        "model.Item": {
+            "type": "object",
+            "properties": {
+                "item_code": {
+                    "type": "string"
+                },
+                "item_description": {
+                    "type": "string"
+                },
+                "item_id": {
+                    "type": "integer"
+                },
+                "item_name": {
+                    "type": "string"
+                },
+                "item_purchase_price": {
+                    "type": "number"
+                },
+                "item_sell_price": {
+                    "type": "number"
+                },
+                "item_unit": {
+                    "type": "string"
+                },
+                "supplier_id": {
+                    "type": "integer"
                 }
             }
         },

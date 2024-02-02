@@ -10,6 +10,7 @@ const TableNameItem = "items"
 type Item struct {
 	ItemID            int32   `gorm:"column:item_id;primaryKey;autoIncrement:true" json:"item_id"`
 	SupplierID        int32   `gorm:"column:supplier_id;not null" json:"supplier_id"`
+	ItemCode          string  `gorm:"column:item_code;not null" json:"item_code"`
 	ItemName          string  `gorm:"column:item_name;not null" json:"item_name"`
 	ItemDescription   *string `gorm:"column:item_description" json:"item_description"`
 	ItemPurchasePrice float64 `gorm:"column:item_purchase_price;not null" json:"item_purchase_price"`

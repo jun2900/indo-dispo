@@ -2,6 +2,7 @@ package entity
 
 type AddItemReq struct {
 	Name          string       `json:"item_name"`
+	Code          string       `json:"item_code"`
 	Description   *string      `json:"item_description"`
 	PurchasePrice float64      `json:"item_purchase_price"`
 	SellPrice     float64      `json:"item_sell_price"`
@@ -17,6 +18,7 @@ type WholeSaler struct {
 
 type ListItemBySupplierResp struct {
 	Id            int32            `json:"item_id"`
+	Code          string           `json:"item_code"`
 	PurchasePrice float64          `json:"item_purchase_price"`
 	SellPrice     float64          `json:"item_sell_price"`
 	Unit          string           `json:"item_unit"`

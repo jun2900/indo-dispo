@@ -190,6 +190,7 @@ func (s *SupplierController) GetItemsBySupplierId(c *fiber.Ctx) error {
 
 		resp = append(resp, entity.ListItemBySupplierResp{
 			Id:            is.ItemID,
+			Code:          is.ItemCode,
 			PurchasePrice: is.ItemPurchasePrice,
 			SellPrice:     is.ItemSellPrice,
 			Unit:          is.ItemUnit,

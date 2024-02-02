@@ -2,7 +2,9 @@ package controller
 
 import (
 	"fmt"
+	"log"
 
+	"github.com/jun2900/indo-dispo/dal"
 	"github.com/jun2900/indo-dispo/entity"
 	"github.com/jun2900/indo-dispo/model"
 	"github.com/jun2900/indo-dispo/services"
@@ -57,6 +59,13 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 		})
 	}
 
+	if len(input.Code) < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     "item code cannot be empty",
+		})
+	}
+
 	item, _ := i.itemService.GetItemByItemName(input.Name)
 	if item != nil {
 		_, err := i.itemService.GetItemWithItemIdAndSupplierId(item.ItemID, input.SupplierId)
@@ -69,6 +78,7 @@ func (i *ItemController) RegisterItem(c *fiber.Ctx) error {
 	}
 	item, _, err := i.itemService.CreateItem(&model.Item{
 		SupplierID:        input.SupplierId,
+		ItemCode:          input.Code,
 		ItemName:          input.Name,
 		ItemDescription:   input.Description,
 		ItemPurchasePrice: input.PurchasePrice,
@@ -244,4 +254,29 @@ func (i *ItemController) DeleteItem(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(entity.StatusResponse{
 		Status: "successfully deleted item",
 	})
+}
+
+// @Summary Get Item by Item Code
+// @Tags Item
+// @Accept  json
+// @Produce  json
+// @Param  itemCode path string true "item code"
+// @Success 200 {object} model.Item
+// @Failure 400 {object} entity.ErrRespController
+// @Failure 500 {object} entity.ErrRespController
+// @Router /item/{itemCode} [get]
+func (i *ItemController) GetItemByCodeItem(c *fiber.Ctx) error {
+	functionName := "GetItemByCodeItem"
+	log.Println("get item by code item")
+
+	item, err := dal.Item.Where(dal.Item.ItemCode.Eq(c.Params("itemCode"))).First()
+	if err != nil {
+		log.Printf("error on retrieving item, details = %v\n", err)
+		return c.Status(fiber.StatusBadRequest).JSON(entity.ErrRespController{
+			SourceFunction: functionName,
+			ErrMessage:     fmt.Sprintf("cannot retrieve item, details = %v", err),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(item)
 }

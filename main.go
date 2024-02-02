@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jun2900/indo-dispo/controller"
+	"github.com/jun2900/indo-dispo/dal"
 	"github.com/jun2900/indo-dispo/infrastructure"
 	"github.com/jun2900/indo-dispo/model"
 	"github.com/jun2900/indo-dispo/services"
@@ -53,6 +54,8 @@ func main() {
 	readEnvironmentFile()
 
 	DB := infrastructure.OpenDbConnection()
+	dal.SetDefault(DB)
+
 	go scheduleDailyTask(18, 0, 0, func() {
 		scriptCheckRecurring(DB)
 	})
@@ -100,6 +103,7 @@ func main() {
 	app.Post("/item", itemController.RegisterItem)
 	app.Put("/item/:itemId", itemController.UpdateItem)
 	app.Delete("/item/:itemId", itemController.DeleteItem)
+	app.Get("/item/:itemCode", itemController.GetItemByCodeItem)
 
 	app.Post("/bill", billController.CreateBill)
 	app.Get("/bills", billController.GetAllBills)
